@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import ttk, filedialog #custom widget set
 from tkinter import messagebox
-import mysql.connector
 
 window=Tk()
 window.geometry("400x400")
@@ -15,13 +14,7 @@ login_label.grid(row=0,column=0,columnspan=3,pady=20,sticky=NSEW)
 Mframe=Frame(window,bg='#333333')
 Mframe.grid(row=1,column=1,padx=20,pady=20,sticky=N)
 
-def connect_db():
-    return mysql.connector.connect(
-        host='localhost',
-        user='Siddhant',  
-        password='S!ddhantmysql7pass',  
-        database='user_db'
-    )
+
 
 
 def signupwindow():
@@ -36,17 +29,7 @@ def signupwindow():
         email=email_entry.get()
         phone=phone_entry.get()
         password=password_entry.get()
-        
-        conn=connect_db()
-        cursor=conn.cursor()
-        
-        # Use a hashed password in practice (not shown here)
-        cursor.execute("INSERT INTO users (username,email,phone,password) VALUES (%s,%s,%s,%s)",
-                    (username,email,phone,password))
-        conn.commit()
-        messagebox.showinfo("Success","Account created successfully!")
-        conn.close()
-
+       
 
 
     def loginpage():
@@ -102,7 +85,7 @@ def MainWindow():
 
     def dropdown():
         Back2login=Button(window2,text="logout",relief=RAISED,bg='#969997',fg='black',width=10,height=3,command= return_to_login)
-        Savedprop=Button(window2,text="Saved",relief=RAISED,bg='#969997',fg='black',width=10,height=3,)
+        Savedprop=Button(window2,text="My properties",relief=RAISED,bg='#969997',fg='black',width=10,height=3,)
 
         Back2login.grid(row=1,column=3)
         Savedprop.grid(row=2,column=3)
