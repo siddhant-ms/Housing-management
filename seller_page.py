@@ -72,7 +72,7 @@ root = tk.Tk()
 background_color = "#8aa3d1"
 root.configure(bg=background_color)
 root.title("Property Form")
-root.geometry("800x600")  # Set a default window size
+root.geometry("10000x10000")  # Set a default window size
 
 # Create the main frame to contain everything
 main_frame = tk.Frame(root)
