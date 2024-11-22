@@ -1,15 +1,8 @@
 import tkinter as tk
 from tkinter import ttk, filedialog
 
-# Function to handle property type selection
-def update_property_name_field(*args):
-    if property_type_var.get() in ["Apartment", "Commercial"]:
-        property_name_entry.configure(state='normal')
-    else:
-        property_name_entry.configure(state='disabled')
-        property_name_entry.delete(0, tk.END)  # Clear the entry if disabled
 
-# Function to open file dialog and select multiple images
+# chatgpt
 def add_images():
     file_paths = filedialog.askopenfilenames(
         filetypes=[("Image files", "*.jpg *.jpeg *.png")])
@@ -22,7 +15,6 @@ def add_images():
         prev_button.pack(side=tk.LEFT, padx=10, pady=10)
         next_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
-# Function to display an image at a given index
 def display_image(index):
     global current_image_index
     if images:
@@ -37,7 +29,7 @@ def next_image():
 def prev_image():
     display_image(current_image_index - 1)
 
-# Function to show secondary dropdown based on the selected city
+##function to show the secondary dropdown based on the location
 def show_secondary_dropdown(event):
     city_areas = {
         "Mumbai": ["Colaba", "Bandra", "Andheri", "Dadar", "Malad", "Worli", "Thane", "Borivali", "Goregaon", "Santacruz", "Khar", "Vile Parle"],
@@ -62,7 +54,7 @@ def show_secondary_dropdown(event):
         secondary_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
         secondary_dropdown.grid(row=3, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
         secondary_dropdown['values'] = city_areas[selected_city]
-        secondary_dropdown.current(0)  # Set the default selection to the first area
+        
     else:
         secondary_label.grid_remove()
         secondary_dropdown.grid_remove()
@@ -85,7 +77,6 @@ main_frame.rowconfigure(0, weight=1)
 
 # Variables to hold the values of the options
 property_type_var = tk.StringVar()
-property_type_var.trace("w", update_property_name_field)
 looking_to_var = tk.StringVar()
 bhk_var = tk.StringVar()
 location_var = tk.StringVar()

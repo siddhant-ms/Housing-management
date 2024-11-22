@@ -24,18 +24,16 @@ def signupwindow():
     SUwindow.geometry("400x250")
     SUwindow.configure(bg="#333333")
 
-    def register_user():
+
+
+
+    def loginpage():
+        SUwindow.destroy()  # Closes the sign-up window
+        window.deiconify()        
         username=username_entry.get()
         email=email_entry.get()
         phone=phone_entry.get()
         password=password_entry.get()
-       
-
-
-    def loginpage():
-        SUwindow.destroy()  # Close the sign-up window
-        window.deiconify()        
-
     signup_title=Label(SUwindow,text="SIGN UP",font=('boulder',30,'bold'),relief=RIDGE,bg='#353935',fg='#ffffff')
 
     username_label=Label(SUwindow,text="Username:",bg='#333333',fg='#ffffff')
@@ -49,7 +47,7 @@ def signupwindow():
 
     password_label=Label(SUwindow,text="Password:",bg='#333333',fg='#ffffff')
     password_entry=Entry(SUwindow,show="*")
-
+    
     signup_button=Button(SUwindow,text="Create account",bg='#333333',fg='#ffffff',command=loginpage)
 
     signup_title.grid(row=0,column=0,columnspan=2,pady=5)
@@ -85,10 +83,57 @@ def MainWindow():
 
     def dropdown():
         Back2login=Button(window2,text="logout",relief=RAISED,bg='#969997',fg='black',width=10,height=3,command= return_to_login)
-        Savedprop=Button(window2,text="My properties",relief=RAISED,bg='#969997',fg='black',width=10,height=3,)
+        Savedprop=Button(window2,text="My properties",relief=RAISED,bg='#969997',fg='black',width=10,height=3,command=proppage)
 
         Back2login.grid(row=1,column=3)
         Savedprop.grid(row=2,column=3)
+
+
+    def proppage():
+
+        # Initialize the main window
+        prp = Tk()
+        prp.title("My Properties")
+        prp.geometry("600x400")  # Adjust the window size as needed
+        prp.configure(bg="#8aa3d1")
+
+        # Create the frame for "Added Properties"
+        added_frame = Frame(prp, bg="#8aa3d1", width=290, height=400)  # Matches background color of main window
+        added_frame.grid(row=0, column=0, padx=(10, 5), pady=10, sticky="nsew")
+
+        # Label for Added Properties with ridge relief
+        added_label = Label(
+            added_frame, 
+            text="ADDED PROPERTIES", 
+            bg="gray", 
+            fg="white", 
+            font=("Arial", 12, "bold"),
+            relief="ridge",
+            padx=5,
+            pady=5
+        )
+        added_label.pack(fill="x", pady=5)
+
+        # Create the frame for "Viewed Properties"
+        viewed_frame = Frame(prp, bg="#8aa3d1", width=290, height=400)  # Matches background color of main window
+        viewed_frame.grid(row=0, column=2, padx=(5, 10), pady=10, sticky="nsew")
+
+        # Label for Viewed Properties with ridge relief
+        viewed_label = Label(viewed_frame,text="VIEWED PROPERTIES",bg="gray", fg="white", font=("Arial", 12, "bold"),relief="ridge",padx=5,pady=5)
+        viewed_label.pack(fill="x", pady=5)
+
+        # Create the dividing line between frames
+        divider_line = Frame(prp, bg="black", width=2, height=400)
+        divider_line.grid(row=0, column=1, sticky="ns", padx=5)
+
+        # Configure grid weights to make frames resizable
+        prp.grid_columnconfigure(0, weight=1)
+        prp.grid_columnconfigure(2, weight=1)
+        prp.grid_rowconfigure(0, weight=1)
+
+
+
+
 
 
 
