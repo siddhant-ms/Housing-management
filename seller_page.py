@@ -66,9 +66,12 @@ root.configure(bg=background_color)
 root.title("Property Form")
 root.geometry("10000x10000")  # Set a default window size
 
+
 # Create the main frame to contain everything
 main_frame = tk.Frame(root)
 main_frame.pack(fill=tk.BOTH, expand=1)
+main_frame.configure(bg=background_color)
+
 
 # Configure rows and columns to be responsive
 main_frame.columnconfigure(0, weight=1)
@@ -84,19 +87,21 @@ location_var = tk.StringVar()
 # Create the left frame for the form
 left_frame = tk.Frame(main_frame)
 left_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
+left_frame.configure(background=background_color)
+
 
 # Create the form layout in the left frame
-ttk.Label(left_frame, text="NAME").grid(row=0, column=0, sticky='w', padx=10, pady=5)
-name_entry = ttk.Entry(left_frame)
+ttk.Label(left_frame, text="NAME",background=background_color).grid(row=0, column=0, sticky='w', padx=10, pady=5)
+name_entry = ttk.Entry(left_frame,background=background_color)
 name_entry.grid(row=0, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-ttk.Label(left_frame, text="PROPERTY TYPE").grid(row=1, column=0, sticky='w', padx=10, pady=5)
-ttk.Radiobutton(left_frame, text="Independent", variable=property_type_var, value="Independent").grid(row=1, column=1, sticky='w', padx=10)
-ttk.Radiobutton(left_frame, text="Apartment", variable=property_type_var, value="Apartment").grid(row=1, column=2, sticky='w', padx=10)
-ttk.Radiobutton(left_frame, text="Commercial", variable=property_type_var, value="Commercial").grid(row=1, column=3, sticky='w', padx=10)
+property_type_radio=ttk.Label(left_frame, text="PROPERTY TYPE",background=background_color).grid(row=1, column=0, sticky='w', padx=10, pady=5)
+independent_radio=ttk.Radiobutton(left_frame, text="Independent", variable=property_type_var, value="Independent").grid(row=1, column=1, sticky='w', padx=10)
+apartment_radio=ttk.Radiobutton(left_frame, text="Apartment", variable=property_type_var, value="Apartment").grid(row=1, column=2, sticky='w', padx=10)
+commercial_radio=ttk.Radiobutton(left_frame, text="Commercial", variable=property_type_var, value="Commercial").grid(row=1, column=3, sticky='w', padx=10)
 
 # Location dropdown
-location_label = tk.Label(left_frame, text="LOCATION")
+location_label = tk.Label(left_frame, text="LOCATION",background=background_color)
 location_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
 
 location_dropdown = ttk.Combobox(left_frame, textvariable=location_var, state='readonly', style="TCombobox")
@@ -107,37 +112,37 @@ location_dropdown.grid(row=2, column=1, columnspan=3, sticky='ew', padx=10, pady
 location_dropdown.bind("<<ComboboxSelected>>", show_secondary_dropdown)
 
 # Secondary dropdown (initially hidden)
-secondary_label = tk.Label(left_frame, text="AREA")
-secondary_dropdown = ttk.Combobox(left_frame, state='readonly', style="TCombobox")
+secondary_label = tk.Label(left_frame, text="AREA",background=background_color)
+secondary_dropdown = ttk.Combobox(left_frame, state='readonly', style="TCombobox",background=background_color)
 
 # Initially hide the secondary dropdown
 secondary_label.grid_remove()
 secondary_dropdown.grid_remove()
 
-ttk.Label(left_frame, text="PROPERTY NAME").grid(row=4, column=0, sticky='w', padx=10, pady=5)
+ttk.Label(left_frame, text="PROPERTY NAME",background=background_color).grid(row=4, column=0, sticky='w', padx=10, pady=5)
 property_name_entry = ttk.Entry(left_frame)
 property_name_entry.grid(row=4, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-ttk.Label(left_frame, text="LOOKING TO").grid(row=5, column=0, sticky='w', padx=10, pady=5)
+ttk.Label(left_frame, text="LOOKING TO",background=background_color).grid(row=5, column=0, sticky='w', padx=10, pady=5)
 ttk.Radiobutton(left_frame, text="Sell", variable=looking_to_var, value="Sell").grid(row=5, column=1, sticky='w', padx=10)
 ttk.Radiobutton(left_frame, text="Rent", variable=looking_to_var, value="Rent").grid(row=5, column=2, sticky='w', padx=10)
 
-ttk.Label(left_frame, text="PRICE").grid(row=6, column=0, sticky='w', padx=10, pady=5)
+ttk.Label(left_frame, text="PRICE",background=background_color).grid(row=6, column=0, sticky='w', padx=10, pady=5)
 price_entry = ttk.Entry(left_frame)
 price_entry.grid(row=6, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-ttk.Label(left_frame, text="BHK").grid(row=7, column=0, sticky='w', padx=10, pady=5)
+ttk.Label(left_frame, text="BHK",background=background_color).grid(row=7, column=0, sticky='w', padx=10, pady=5)
 ttk.Radiobutton(left_frame, text="1 BHK", variable=bhk_var, value="1 BHK").grid(row=7, column=1, sticky='w', padx=10)
 ttk.Radiobutton(left_frame, text="2 BHK", variable=bhk_var, value="2 BHK").grid(row=7, column=2, sticky='w', padx=10)
 ttk.Radiobutton(left_frame, text="3 BHK", variable=bhk_var, value="3 BHK").grid(row=7, column=3, sticky='w', padx=10)
 ttk.Radiobutton(left_frame, text="4 BHK+", variable=bhk_var, value="4 BHK+").grid(row=7, column=4, sticky='w', padx=10)
 
-ttk.Label(left_frame, text="SQ FT").grid(row=8, column=0, sticky='w', padx=10, pady=5)
+ttk.Label(left_frame, text="SQ FT",background=background_color).grid(row=8, column=0, sticky='w', padx=10, pady=5)
 sq_ft_entry = ttk.Entry(left_frame)
 sq_ft_entry.grid(row=8, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
 # Amenities Section
-ttk.Label(left_frame, text="Amenities").grid(row=9, column=0, sticky='w', padx=10, pady=5)
+ttk.Label(left_frame, text="Amenities",background=background_color).grid(row=9, column=0, sticky='w', padx=10, pady=5)
 
 # Create a frame to hold checkboxes for amenities
 amenities_frame = tk.Frame(left_frame)
