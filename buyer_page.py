@@ -27,9 +27,9 @@ def update_rent_label(value):
 ##switches b/w rent and buy slider
 def show_slider():
     if looking_var.get()=="Rent":
-        rent_range.config(from_=0,to=150000,resolution=1000)
+        rent_range.config(from_=0,to=100000, resolution=1000)
         rent_min_label.config(text="₹ 0")
-        rent_max_label.config(text="₹ 1.5L")
+        rent_max_label.config(text="₹ 1L")
         
         rent_label.grid(row=11,column=0,padx=10,pady=5,sticky="w")
         rent_range.grid(row=12, column=0, columnspan=2,padx=20,pady=5,sticky="we")
@@ -162,9 +162,9 @@ budget_max_label.grid_remove()
 
 # Rent Budget slider (initially hidden)
 rent_label=tk.Label(root,text="Rent Budget:",bg=background_color)
-rent_range=tk.Scale(root,from_=0, to=150000,orient=tk.HORIZONTAL,resolution=1000,bg=background_color,troughcolor=background_color,command=update_rent_label)
+rent_range=tk.Scale(root,from_=0, to=10000,orient=tk.HORIZONTAL,resolution=1000,bg=background_color,troughcolor=background_color,command=update_rent_label)
 rent_min_label=tk.Label(root,text="₹ 0",bg=background_color)
-rent_max_label=tk.Label(root,text="₹ 1.5L",bg=background_color)
+rent_max_label=tk.Label(root,text="₹ 1L",bg=background_color)
 rent_label.grid_remove()
 rent_range.grid_remove()
 rent_min_label.grid_remove()

@@ -1,221 +1,181 @@
 import tkinter as tk
-from tkinter import ttk, filedialog
+import mysql.connector
 
+def seller_page():
+    def get_locations_from_db():
+        try:
+            connection = mysql.connector.connect(
+                host="localhost",
+                user="root",
+                password="1234",
+                database="house_management"
+            )
+            cursor = connection.cursor()
 
-# chatgpt
-def add_images():
-    file_paths = filedialog.askopenfilenames(
-        filetypes=[("Image files", "*.jpg *.jpeg *.png")])
-    for file_path in file_paths:
-        img = tk.PhotoImage(file=file_path)
-        img = img.subsample(2, 2)  # Resize the image by subsampling
-        images.append(img)
-    if images:
-        display_image(0)  # Display the first image after adding
-        prev_button.pack(side=tk.LEFT, padx=10, pady=10)
-        next_button.pack(side=tk.RIGHT, padx=10, pady=10)
+            cursor.execute("SELECT city, area FROM city_areas ORDER BY city, area")
+            locations = cursor.fetchall()
 
-def display_image(index):
-    global current_image_index
-    if images:
-        current_image_index = index % len(images)
-        image_label.configure(image=images[current_image_index])
+            connection.close()
 
-# Function to go to the next image
-def next_image():
-    display_image(current_image_index + 1)
+            states = {}
+            for state, city in locations:
+                if state not in states:
+                    states[state] = []
+                states[state].append(city)
 
-# Function to go to the previous image
-def prev_image():
-    display_image(current_image_index - 1)
+            return states
 
-##function to show the secondary dropdown based on the location
-def show_secondary_dropdown(event):
-    city_areas = {
-        "Mumbai": ["Colaba", "Bandra", "Andheri", "Dadar", "Malad", "Worli", "Thane", "Borivali", "Goregaon", "Santacruz", "Khar", "Vile Parle"],
-        "Delhi": ["Connaught Place", "Hauz Khas", "Greater Kailash", "Lajpat Nagar", "Karol Bagh", "Dwarka", "Saket", "Rohini", "Shalimar Bagh", "Chandni Chowk", "Gurgaon"],
-        "Bengaluru": ["MG Road", "Marathahalli", "Indiranagar", "Koramangala", "Whitefield", "Jayanagar", "Malleshwaram", "Electronic City", "HSR Layout", "Bellandur", "Rajajinagar", "Yelahanka", "Dodanakundi"],
-        "Chennai": ["T Nagar", "Anna Nagar", "Mylapore", "Adyar", "Velachery", "Nungambakkam", "Alwarpet", "Triplicane", "Egmore", "Kotturpuram", "Thiruvanmiyur"],
-        "Kolkata": ["Park Street", "Salt Lake City", "Ballygunge", "Behala", "Garia", "Esplanade", "North Kolkata", "Tollygunge", "Bhowanipore"],
-        "Hyderabad": ["Banjara Hills", "Jubilee Hills", "Hitech City", "Kukatpally", "Madhapur", "Ameerpet", "Old City (Hyderabad)", "Sanath Nagar", "Shamirpet", "Begumpet"],
-        "Pune": ["Koregaon Park", "Kalyani Nagar", "Hinjewadi", "Viman Nagar", "Sadashiv Peth", "Shivaji Nagar", "Bibwewadi", "Sangamwadi", "Hadapsar", "Balewadi"],
-        "Ahmedabad": ["Naroda", "Vastrapur", "Maninagar", "Thaltej", "Bopal", "Ellis Bridge", "Navrangpura", "Chandkheda", "Anandnagar", "Shahibaug"],
-        "Jaipur": ["C-Scheme", "Malviya Nagar", "Vaishali Nagar", "Mansarovar", "Raja Park", "Jhotwara", "Ajmer Road", "Sanganer", "Shastri Nagar", "Bhankrota", "Pratap Nagar"],
-        "Lucknow": ["Hazratganj", "Gomti Nagar", "Alambagh", "Indiranagar", "Mahanagar", "Krishna Nagar", "Kalyanpur", "Chowk"],
-        "Nagpur": ["Civil Lines", "Sitabuldi", "Sadar", "Dharampeth", "Ramdaspeth", "Manish Nagar", "Katol Road", "Hingna"],
-        "Visakhapatnam": ["Beach Road", "Daba Gardens", "MVP Colony", "Gajuwaka", "Pendurthi", "Kancharapalem", "Kothapeta", "Waltair"],
-        "Indore": ["Rajendra Nagar", "Vijay Nagar", "AB Road", "Bhawarkuan", "Malhar Mega Mall", "Ujjain Road", "Rau", "Banganga"],
-        "Coimbatore": ["RS Puram", "Gandhipuram", "Peelamedu", "Saravanampatti", "Singanallur", "Race Course", "Vadavalli", "Kalapatti"],
-        "Patna": ["Boring Road", "Kankarbagh", "Patliputra", "Gardanibagh", "Rajendra Nagar", "Bailey Road", "Mithapur", "Anisabad"]
-    }
+        except mysql.connector.Error as err:
+            print(f"Error: {err}")
+            return {}
 
-    selected_city = location_var.get()
-    if selected_city in city_areas:
-        secondary_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
-        secondary_dropdown.grid(row=3, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
-        secondary_dropdown['values'] = city_areas[selected_city]
-        
-    else:
-        secondary_label.grid_remove()
-        secondary_dropdown.grid_remove()
+    def show_secondary_dropdown(event):
+        selected_state = location_var.get()
+        if selected_state in city_areas:
+            secondary_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+            secondary_dropdown.grid(row=3, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+            secondary_dropdown['values'] = city_areas[selected_state]
+        else:
+            secondary_label.grid_remove()
+            secondary_dropdown.grid_remove()
 
-# Create the main window
-root = tk.Tk()
-background_color = "#8aa3d1"
-root.configure(bg=background_color)
-root.title("Property Form")
-root.geometry("10000x10000")  # Set a default window size
+    def update_price_slider(selected_option):
+        if selected_option == "Sell":
+            price_slider_label.config(text="SELL PRICE")
+            price_slider.config(troughcolor=background_color,from_=1000000, to=500000000, resolution=1000000, command=update_price_label)
+            update_price_label(price_slider.get())
+        elif selected_option == "Rent":
+            price_slider_label.config(text="RENT PRICE")
+            price_slider.config(troughcolor=background_color,from_=5000, to=50000, resolution=500, command=update_price_label)
+            update_price_label(price_slider.get())
 
+    def update_price_label(value):
+        value = int(value)
+        if value >= 10000000:
+            price_value_label.config(text=f"₹ {value / 10000000} Cr")
+        elif value >= 100000:
+            price_value_label.config(text=f"₹ {value / 100000} L")
+        elif value >= 1000:
+            price_value_label.config(text=f"₹ {value / 1000} k")
+        else:
+            price_value_label.config(text=f"₹ {value}")
 
-# Create the main frame to contain everything
-main_frame = tk.Frame(root)
-main_frame.pack(fill=tk.BOTH, expand=1)
-main_frame.configure(bg=background_color)
+    city_areas = get_locations_from_db()
 
+    root = tk.Tk()
+    background_color = "#8aa3d1"
+    root.configure(bg=background_color)
+    root.title("Property Form")
 
-# Configure rows and columns to be responsive
-main_frame.columnconfigure(0, weight=1)
-main_frame.columnconfigure(1, weight=1)
-main_frame.rowconfigure(0, weight=1)
+    main_frame = tk.Frame(root, bg=background_color)
+    main_frame.pack(fill=tk.BOTH, expand=1)
 
-# Variables to hold the values of the options
-property_type_var = tk.StringVar()
-looking_to_var = tk.StringVar()
-bhk_var = tk.StringVar()
-location_var = tk.StringVar()
+    property_type_var = tk.StringVar()
+    looking_to_var = tk.StringVar()
+    bhk_var = tk.StringVar()
+    location_var = tk.StringVar()
 
-# Create the left frame for the form
-left_frame = tk.Frame(main_frame)
-left_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
-left_frame.configure(background=background_color)
+    left_frame = tk.Frame(main_frame, bg=background_color)
+    left_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
+    tk.Label(left_frame, text="NAME", bg=background_color).grid(row=0, column=0, sticky='w', padx=10, pady=5)
+    name_entry = tk.Entry(left_frame)
+    name_entry.grid(row=0, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-# Create the form layout in the left frame
-ttk.Label(left_frame, text="NAME",background=background_color).grid(row=0, column=0, sticky='w', padx=10, pady=5)
-name_entry = ttk.Entry(left_frame,background=background_color)
-name_entry.grid(row=0, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+    tk.Label(left_frame, text="PROPERTY TYPE", bg=background_color).grid(row=1, column=0, sticky='w', padx=10, pady=5)
+    tk.Radiobutton(left_frame, text="Independent", variable=property_type_var, value="Independent", bg=background_color).grid(row=1, column=1, sticky='w', padx=10)
+    tk.Radiobutton(left_frame, text="Apartment", variable=property_type_var, value="Apartment", bg=background_color).grid(row=1, column=2, sticky='w', padx=10)
+    tk.Radiobutton(left_frame, text="Commercial", variable=property_type_var, value="Commercial", bg=background_color).grid(row=1, column=3, sticky='w', padx=10)
 
-property_type_radio=ttk.Label(left_frame, text="PROPERTY TYPE",background=background_color).grid(row=1, column=0, sticky='w', padx=10, pady=5)
-independent_radio=ttk.Radiobutton(left_frame, text="Independent", variable=property_type_var, value="Independent").grid(row=1, column=1, sticky='w', padx=10)
-apartment_radio=ttk.Radiobutton(left_frame, text="Apartment", variable=property_type_var, value="Apartment").grid(row=1, column=2, sticky='w', padx=10)
-commercial_radio=ttk.Radiobutton(left_frame, text="Commercial", variable=property_type_var, value="Commercial").grid(row=1, column=3, sticky='w', padx=10)
+    # Label for Location dropdown
+    location_label = tk.Label(left_frame, text="LOCATION", bg=background_color)
+    location_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
 
-# Location dropdown
-location_label = tk.Label(left_frame, text="LOCATION",background=background_color)
-location_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
+    # Location dropdown with OptionMenu
+    location_var = tk.StringVar()
+    location_dropdown = tk.OptionMenu(left_frame, location_var, *city_areas.keys())
+    location_dropdown.configure(bg=background_color)
+    location_dropdown.grid(row=2, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-location_dropdown = ttk.Combobox(left_frame, textvariable=location_var, state='readonly', style="TCombobox")
-location_dropdown['values'] = ["Mumbai", "Delhi", "Bengaluru", "Chennai", "Kolkata", "Hyderabad", "Ahmedabad", "Jaipur", "Lucknow", "Nagpur", "Visakhapatnam", "Indore", "Coimbatore", "Patna", "Pune"]
-location_dropdown.grid(row=2, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+    # Label for Area dropdown (secondary dropdown) - hidden initially
+    secondary_label = tk.Label(left_frame, text="AREA", bg=background_color)
+    secondary_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+    secondary_label.grid_remove()  # Hide initially
 
-# Bind selection event to show_secondary_dropdown function
-location_dropdown.bind("<<ComboboxSelected>>", show_secondary_dropdown)
+    # Secondary dropdown (area dropdown) - hidden initially
+    secondary_var = tk.StringVar()
+    secondary_dropdown = tk.OptionMenu(left_frame, secondary_var, "")
+    secondary_dropdown.configure(bg=background_color)
+    secondary_dropdown.grid(row=3, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+    secondary_dropdown.grid_remove()  # Hide initially
 
-# Secondary dropdown (initially hidden)
-secondary_label = tk.Label(left_frame, text="AREA",background=background_color)
-secondary_dropdown = ttk.Combobox(left_frame, state='readonly', style="TCombobox",background=background_color)
+    # Function to update the secondary dropdown based on the location selected
+    def show_secondary_dropdown(*args):  # Accepting *args to match the event binding
+        selected_location = location_var.get()
+        if selected_location in city_areas and city_areas[selected_location]:
+            # Show the secondary label and dropdown
+            secondary_label.grid(row=3, column=0, padx=10, pady=5, sticky="w")
+            secondary_dropdown.grid(row=3, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+            
+            # Update the secondary dropdown with areas based on the selected location
+            secondary_dropdown['menu'].delete(0, 'end')  # Clear the old values
+            for area in city_areas[selected_location]:
+                secondary_dropdown['menu'].add_command(label=area, command=tk._setit(secondary_var, area))
+        else:
+            # Hide the secondary label and dropdown if no valid location is selected
+            secondary_label.grid_remove()
+            secondary_dropdown.grid_remove()
 
-# Initially hide the secondary dropdown
-secondary_label.grid_remove()
-secondary_dropdown.grid_remove()
+    # Bind the location dropdown to the function that updates the secondary dropdown
+    location_var.trace("w", show_secondary_dropdown)  # Listen for changes in location_var
 
-ttk.Label(left_frame, text="PROPERTY NAME",background=background_color).grid(row=4, column=0, sticky='w', padx=10, pady=5)
-property_name_entry = ttk.Entry(left_frame)
-property_name_entry.grid(row=4, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+    tk.Label(left_frame, text="PROPERTY NAME", bg=background_color).grid(row=4, column=0, sticky='w', padx=10, pady=5)
+    property_name_entry = tk.Entry(left_frame)
+    property_name_entry.grid(row=4, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-ttk.Label(left_frame, text="LOOKING TO",background=background_color).grid(row=5, column=0, sticky='w', padx=10, pady=5)
-ttk.Radiobutton(left_frame, text="Sell", variable=looking_to_var, value="Sell").grid(row=5, column=1, sticky='w', padx=10)
-ttk.Radiobutton(left_frame, text="Rent", variable=looking_to_var, value="Rent").grid(row=5, column=2, sticky='w', padx=10)
+    tk.Label(left_frame, text="LOOKING TO", bg=background_color).grid(row=5, column=0, sticky='w', padx=10, pady=5)
+    tk.Radiobutton(left_frame, text="Sell", variable=looking_to_var, value="Sell", bg=background_color, command=lambda: update_price_slider('Sell')).grid(row=5, column=1, sticky='w', padx=10)
+    tk.Radiobutton(left_frame, text="Rent", variable=looking_to_var, value="Rent", bg=background_color, command=lambda: update_price_slider('Rent')).grid(row=5, column=2, sticky='w', padx=10)
 
-ttk.Label(left_frame, text="PRICE",background=background_color).grid(row=6, column=0, sticky='w', padx=10, pady=5)
-price_entry = ttk.Entry(left_frame)
-price_entry.grid(row=6, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+    price_slider_label = tk.Label(left_frame, text="", bg=background_color)
+    price_slider_label.grid(row=6, column=0, sticky="w", padx=10, pady=5)
 
-ttk.Label(left_frame, text="BHK",background=background_color).grid(row=7, column=0, sticky='w', padx=10, pady=5)
-ttk.Radiobutton(left_frame, text="1 BHK", variable=bhk_var, value="1 BHK").grid(row=7, column=1, sticky='w', padx=10)
-ttk.Radiobutton(left_frame, text="2 BHK", variable=bhk_var, value="2 BHK").grid(row=7, column=2, sticky='w', padx=10)
-ttk.Radiobutton(left_frame, text="3 BHK", variable=bhk_var, value="3 BHK").grid(row=7, column=3, sticky='w', padx=10)
-ttk.Radiobutton(left_frame, text="4 BHK+", variable=bhk_var, value="4 BHK+").grid(row=7, column=4, sticky='w', padx=10)
+    price_slider = tk.Scale(left_frame, from_=0, to=0, resolution=1000, orient="horizontal", bg=background_color)
+    price_slider.grid(row=6, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-ttk.Label(left_frame, text="SQ FT",background=background_color).grid(row=8, column=0, sticky='w', padx=10, pady=5)
-sq_ft_entry = ttk.Entry(left_frame)
-sq_ft_entry.grid(row=8, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+    price_value_label = tk.Label(left_frame, text="", bg=background_color)
+    price_value_label.grid(row=7, column=1, columnspan=3, sticky="w", padx=10, pady=5)
 
-# Amenities Section
-ttk.Label(left_frame, text="Amenities",background=background_color).grid(row=9, column=0, sticky='w', padx=10, pady=5)
+    update_price_slider("Sell")  # Default to "Sell"
 
-# Create a frame to hold checkboxes for amenities
-amenities_frame = tk.Frame(left_frame)
-amenities_frame.grid(row=10, column=0, columnspan=4, sticky='w', padx=10, pady=5)
+    tk.Label(left_frame, text="BHK", bg=background_color).grid(row=8, column=0, sticky='w', padx=10, pady=5)
+    tk.Radiobutton(left_frame, text="1 BHK", variable=bhk_var, value="1 BHK", bg=background_color).grid(row=8, column=1, sticky='w', padx=10)
+    tk.Radiobutton(left_frame, text="2 BHK", variable=bhk_var, value="2 BHK", bg=background_color).grid(row=8, column=2, sticky='w', padx=10)
+    tk.Radiobutton(left_frame, text="3 BHK", variable=bhk_var, value="3 BHK", bg=background_color).grid(row=8, column=3, sticky='w', padx=10)
 
-# Create each checkbox individually
-lift_var = tk.IntVar()
-lift_checkbox = tk.Checkbutton(amenities_frame, text="Lift", variable=lift_var)
-lift_checkbox.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+    tk.Label(left_frame, text="SQ FT", bg=background_color).grid(row=9, column=0, sticky='w', padx=10, pady=5)
+    sq_ft_entry = tk.Entry(left_frame)
+    sq_ft_entry.grid(row=9, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
-parking_var = tk.IntVar()
-parking_checkbox = tk.Checkbutton(amenities_frame, text="Parking", variable=parking_var)
-parking_checkbox.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+    tk.Label(left_frame, text="Amenities", bg=background_color).grid(row=10, column=0, sticky='w', padx=10, pady=5)
+    amenities_frame = tk.Frame(left_frame, bg=background_color)
+    amenities_frame.grid(row=11, column=0, columnspan=4, padx=10, pady=5)
 
-gym_var = tk.IntVar()
-gym_checkbox = tk.Checkbutton(amenities_frame, text="Gym", variable=gym_var)
-gym_checkbox.grid(row=0, column=2, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Lift", bg=background_color).grid(row=0, column=0, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Parking", bg=background_color).grid(row=0, column=1, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Gym", bg=background_color).grid(row=0, column=2, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Furnished", bg=background_color).grid(row=1, column=0, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Public Transport", bg=background_color).grid(row=1, column=1, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Hospital", bg=background_color).grid(row=1, column=2, padx=5, pady=5, sticky="w")
 
-furnished_var = tk.IntVar()
-furnished_checkbox = tk.Checkbutton(amenities_frame, text="Furnished", variable=furnished_var)
-furnished_checkbox.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+    tk.Label(left_frame, text="Description of the property", bg=background_color).grid(row=12, column=0, sticky='w', padx=10, pady=5)
+    about_text = tk.Text(left_frame, height=6, wrap='word')
+    about_text.grid(row=13, column=0, columnspan=4, sticky='ew', padx=10, pady=5)
 
-# New amenities added
-public_transport_var = tk.IntVar()
-public_transport_checkbox = tk.Checkbutton(amenities_frame, text="Public Transport", variable=public_transport_var)
-public_transport_checkbox.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+    submit_button = tk.Button(main_frame, text="Submit", width=6, font=("bold", 15), bg=background_color)
+    submit_button.grid(row=1, column=0, padx=10, pady=10, sticky="s")
 
-hospital_var = tk.IntVar()
-hospital_checkbox = tk.Checkbutton(amenities_frame, text="Hospital", variable=hospital_var)
-hospital_checkbox.grid(row=1, column=2, padx=5, pady=5, sticky="w")
+    root.mainloop()
 
-# About the property section
-about_label = tk.Label(left_frame, text="About the property")
-about_label.grid(row=11, column=0, sticky='w', padx=10, pady=5)
-
-about_text = tk.Text(left_frame, height=13, wrap='word')
-about_text.grid(row=12, column=0, columnspan=4, sticky='ew', padx=10, pady=5)
-
-# Create the right frame for the image handling
-right_frame = tk.Frame(main_frame)
-right_frame.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
-
-# Button to add images
-add_image_button = tk.Button(right_frame, text="Add Images", command=add_images)
-add_image_button.grid(row=0, column=0, padx=10, pady=10, sticky='n')  # Place at the top
-
-# Frame to display the image
-image_display_frame = tk.Frame(right_frame, width=550, height=350, bg='#E0E0E0')
-image_display_frame.grid(row=1, column=0, padx=10, pady=10)  # Below the add images button
-image_display_frame.pack_propagate(False)  # Prevents resizing with the image
-
-# Label inside the frame to display the images
-image_label = tk.Label(image_display_frame, bg='#E0E0E0')  # To blend with the frame
-image_label.pack(expand=True)
-
-# Buttons to navigate through images, initially hidden
-prev_button = tk.Button(right_frame, text="Previous", command=prev_image)
-next_button = tk.Button(right_frame, text="Next", command=next_image)
-
-# Place navigation buttons below the image display frame
-prev_button.grid(row=2, column=0, padx=50, pady=10, sticky='w')
-next_button.grid(row=2, column=0, padx=50, pady=10, sticky='e')
-
-# List to hold the references to images and the current image index
-images = []
-current_image_index = 0
-
-
-
-# Create the "Submit" button and add it to the right frame using grid
-submit_button = tk.Button(right_frame, text="Submit",width=6,font=("bold",15))
-submit_button.grid(row=4, column=0, padx=10, pady=50) 
-
-
-# Start the Tkinter event loop
-root.mainloop()
+if __name__ == "__main__":
+    seller_page()
