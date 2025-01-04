@@ -1,4 +1,6 @@
 from tkinter import *
+from buyer_page import buyer_page
+from seller_page import seller_page
 
 def show_main_window():
     root = Tk()
@@ -73,8 +75,8 @@ def show_main_window():
         bg='#333333',
         fg='#ffffff'
     )
-    Buy = Button(root, text="View properties", bg='grey', fg='black', width=20, height=2)
-    Sell = Button(root, text="Add properties", bg='grey', fg='black', width=20, height=2)
+    Buy = Button(root, text="View properties", bg='grey', fg='black', width=20, height=2, command=buyer_page)
+    Sell = Button(root, text="Add properties", bg='grey', fg='black', width=20, height=2, command=seller_page)
 
     Back2login = Button(
         root,
