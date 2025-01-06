@@ -28,12 +28,12 @@ def get_locations_from_db():
         return {}
     
 def execute_query(query, data):
-    # Establish a connection to the database
+   
     connection = mysql.connector.connect(
         host='localhost',
-        user='root',  # Replace with your MySQL username
-        password='1234',  # Replace with your MySQL password
-        database='house_management'  # Replace with your database name
+        user='root', 
+        password='1234',  
+        database='house_management' 
     )
     
     cursor = connection.cursor()
@@ -53,7 +53,7 @@ def retrieve_current_user():
 # Retrieve the current user from the file
     try:
         with open('current_user.txt', 'r') as file:
-            current_user = file.read().strip()  # Read the username from the file
+            current_user = file.read().strip() 
             return current_user
     except FileNotFoundError:
-        return None  # If the file doesn't exist, no user is logged in
+        return None  # If the file doesn't exist it means no user is logged in, therefore error

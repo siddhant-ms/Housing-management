@@ -38,8 +38,7 @@ def get_current_user():
             current_user = file.read().strip()  # Read the username from the file
             return current_user
     except FileNotFoundError:
-        return None  # If the file doesn't exist, no user is logged in
-
+        return None 
 # Function to write the current user to a file
 def login_user(username_entry, password_entry):
     username = username_entry.get()

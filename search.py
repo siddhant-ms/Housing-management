@@ -4,9 +4,9 @@ from pprint import pprint
 # Database connection function
 def get_connection():
     return mysql.connector.connect(
-        host='localhost',        # Adjust the host if needed
-        user='root',             # Your MySQL username
-        password='1234',         # Your MySQL password
+        host='localhost',      
+        user='root',             
+        password='1234',       
         database='house_management',
     )
 
@@ -34,7 +34,7 @@ def search_properties(data):
             conditions.append("price <= %s")  # assuming budget is the max price
             values.append(value)
         elif key == 'Amenities' and value:  # If there are amenities filters
-            # Assuming amenities are stored as a comma-separated string (or JSON)
+            # Assuming amenities are stored as a comma-separated string 
             conditions.append("FIND_IN_SET(%s, amenities) > 0")
             for amenity in value:
                 values.append(amenity)

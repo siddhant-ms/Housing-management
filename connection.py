@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import errorcode
 
-# Define the city_areas dictionary
+
 city_areas = {
     "Mumbai": ["Colaba", "Bandra", "Andheri", "Dadar", "Malad", "Worli", "Thane", "Borivali", "Goregaon", "Santacruz", "Khar", "Vile Parle"],
     "Delhi": ["Connaught Place", "Hauz Khas", "Greater Kailash", "Lajpat Nagar", "Karol Bagh", "Dwarka", "Saket", "Rohini", "Shalimar Bagh", "Chandni Chowk", "Gurgaon"],
@@ -31,11 +31,11 @@ def check_table_exists(cursor, table_name):
 
 def initialize_database():
     try:
-        # Connect to MySQL server
+        # Connect to mysql server
         connection = mysql.connector.connect(
             host="localhost",
-            user="root",  # Replace with your MySQL username
-            password="1234",  # Replace with your MySQL password
+            user="root", 
+            password="1234", 
             port=3306
         )
         cursor = connection.cursor()
@@ -45,7 +45,7 @@ def initialize_database():
         cursor.execute("CREATE DATABASE IF NOT EXISTS house_management")
         print("Database 'house_management' created or already exists.")
 
-        # Use the created database
+      
         cursor.execute("USE house_management")
         print("Using database 'house_management'.")
 
@@ -89,7 +89,7 @@ def initialize_database():
             cursor.execute(create_properties_table_query)
             print("Table 'properties' created.")
 
-        # Check if the city_areas table exists, if not, create it
+       
         if check_table_exists(cursor, 'city_areas'):
             print("Table 'city_areas' already exists.")
         else:
@@ -103,13 +103,13 @@ def initialize_database():
             cursor.execute(create_city_areas_table_query)
             print("Table 'city_areas' created.")
 
-            # Insert data into city_areas table
+            ##inserts data into city_areas table
             for city, areas in city_areas.items():
                 for area in areas:
                     insert_query = "INSERT INTO city_areas (city, area) VALUES (%s, %s)"
                     cursor.execute(insert_query, (city, area))
             
-            connection.commit()  # Commit the transaction
+            connection.commit()  
             print("City areas data inserted successfully.")
 
     except mysql.connector.Error as err:

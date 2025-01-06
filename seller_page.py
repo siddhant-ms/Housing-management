@@ -8,7 +8,7 @@ def insert_property_data(form_data, username):
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     
-    # Convert the list of amenities to a string
+    ##converts the list of amenities to a string to be instered
     amenities_str = ', '.join(form_data['amenities'])
 
     # Prepare the data for the query
@@ -22,8 +22,8 @@ def insert_property_data(form_data, username):
         form_data['sq_ft'],
         amenities_str,
         form_data['description'],
-        form_data['location'],  # City
-        form_data['area']       # Area
+        form_data['location'],  
+        form_data['area']       
     )
 
     if execute_query(query, data):
@@ -75,17 +75,17 @@ def show_secondary_dropdown(*args, location_var, city_areas, secondary_label, se
 def retrieve_form_data(name_entry, property_type_var, location_var, secondary_var, property_name_entry, looking_to_var, price_slider, bhk_var, sq_ft_entry, var_lift, var_parking, var_gym, var_furnished, var_public_transport, var_hospital, about_text):
     # Retrieving the data from each widget
     name = name_entry.get()  # Name field
-    property_type = property_type_var.get()  # Property type (Independent, Apartment, Commercial)
-    location = location_var.get()  # Location (City)
+    property_type = property_type_var.get()  #  (Independent, Apartment, Commercial)
+    location = location_var.get()  #  (City)
     area = secondary_var.get()  # Area (City-specific)
-    property_name = property_name_entry.get()  # Property name
-    looking_to = looking_to_var.get()  # Looking to (Sell/Rent)
-    price = price_slider.get()  # Price from the slider
-    bhk = bhk_var.get()  # BHK selection (1 BHK, 2 BHK, 3 BHK)
-    sq_ft = sq_ft_entry.get()  # Square footage
+    property_name = property_name_entry.get()  
+    looking_to = looking_to_var.get()  #  (Sell/Rent)
+    price = price_slider.get()  
+    bhk = bhk_var.get()  # (1 BHK, 2 BHK, 3 BHK)
+    sq_ft = sq_ft_entry.get() 
 
-    # Retrieving amenities
-    selected_amenities = []  # List to hold selected amenities
+    # Retrieving amenities in a list so convert into string
+    selected_amenities = []  
     if var_lift.get():
         selected_amenities.append("Lift")
     if var_parking.get():

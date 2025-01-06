@@ -85,11 +85,11 @@ def buyer_page():
             secondary_dropdown.grid(row=1, columnspan=2, column=1, padx=10, pady=5, sticky="ew")
             secondary_dropdown.config(bg=background_color)
             
-            # Clear existing items in the menu
+            # emoves stuff from menu
             menu = secondary_dropdown['menu']
             menu.delete(0, 'end')
             
-            # Add new items based on the selected city
+            # adds new cities
             for area in city_areas[selected_city]:
                 menu.add_command(label=area, command=tk._setit(secondary_dropdown_var, area))
 
@@ -103,7 +103,7 @@ def buyer_page():
     # Initialize Tkinter root window
     root = tk.Tk()
     root.title("Property Buying Page")
-    root.geometry("")  # Window expands to fit the contents
+    root.geometry("")  
     background_color = "#8aa3d1"
     root.configure(bg=background_color)
 
@@ -117,18 +117,18 @@ def buyer_page():
     location_dropdown.config(bg=background_color)
 
     # Adjust grid weight to allow stretching
-    root.grid_columnconfigure(0, weight=0)  # Leave column 0 (label) with no stretch
-    root.grid_columnconfigure(1, weight=1)  # Make column 1 stretchable (for the dropdown)
+    root.grid_columnconfigure(0, weight=0)  
+    root.grid_columnconfigure(1, weight=1)  
     root.grid_rowconfigure(1, weight=1)
-    root.grid_columnconfigure(2, weight=1)  # Make column 2 stretchable (for the dropdown)
+    root.grid_columnconfigure(2, weight=1)  
 
     # Bind selection event to show_secondary_dropdown function
     location_var.trace_add("write", show_secondary_dropdown)
 
     # Secondary dropdown (hidden initially)
     secondary_label = tk.Label(root, text="Area:", bg=background_color)
-    secondary_dropdown_var = tk.StringVar()  # Create a StringVar for the second dropdown
-    secondary_dropdown = tk.OptionMenu(root, secondary_dropdown_var, [])  # Start with an empty list of options
+    secondary_dropdown_var = tk.StringVar()  
+    secondary_dropdown = tk.OptionMenu(root, secondary_dropdown_var, [])  # Starts with an empty list 
 
     # Initially hide the secondary dropdown
     secondary_label.grid_remove()
