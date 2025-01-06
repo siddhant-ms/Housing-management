@@ -1,6 +1,28 @@
 from tkinter import *
+import mysql.connector
 from buyer_page import buyer_page
 from seller_page import seller_page
+from functions import retrieve_current_user  # Import your function
+
+# Function to fetch properties and their prices based on the username
+def get_properties(username):
+    # Connect to MySQL database (adjust your connection details)
+    conn = mysql.connector.connect(
+        host="localhost",
+        user="root",  # Replace with your MySQL username
+        password="1234",  # Replace with your MySQL password
+        database="house_management"
+    )
+    cursor = conn.cursor()
+
+    # Query to fetch both property names and their prices for the logged-in user
+    cursor.execute("SELECT property_name, price FROM properties WHERE username = %s", (username,))
+    properties = cursor.fetchall()  # Fetch all results as a list of tuples
+
+    cursor.close()
+    conn.close()
+
+    return properties
 
 def show_main_window():
     root = Tk()
@@ -21,94 +43,58 @@ def show_main_window():
         dropdown_open = not dropdown_open
 
     def proppage():
+        username = retrieve_current_user()  # Retrieve current logged-in username
+
+        # If no user is logged in, show an error message
+        if not username:
+            print("No user is currently logged in.")
+            return
+
         prp = Toplevel(root)
         prp.title("My Properties")
         prp.geometry("600x400")
         prp.configure(bg="#8aa3d1")
 
-        added_frame = Frame(prp, bg="#8aa3d1", width=290, height=400)
-        added_frame.grid(row=0, column=0, padx=(10, 5), pady=10, sticky="nsew")
+        # Get the properties for the logged-in user
+        properties = get_properties(username)
 
-        added_label = Label(
-            added_frame,
-            text="ADDED PROPERTIES",
-            bg="gray",
-            fg="white",
-            font=("Arial", 12, "bold"),
-            relief="ridge",
-            padx=5,
-            pady=5
-        )
-        added_label.pack(fill="x", pady=5)
+        # Display header for My Properties
+        Label(prp, text="MY PROPERTIES", bg="gray", fg="white", font=("Arial", 12, "bold"), relief="ridge", padx=5, pady=5).grid(row=0, column=0, columnspan=2, sticky="ew")
+        Label(prp, text="Name", bg="#8aa3d1", fg="black", font=("Arial", 10, "bold"), padx=10, pady=5).grid(row=1, column=0, sticky="w", padx=10)
+        Label(prp, text="Price", bg="#8aa3d1", fg="black", font=("Arial", 10, "bold"), padx=10, pady=5).grid(row=1, column=1, sticky="w", padx=10)
 
-        viewed_frame = Frame(prp, bg="#8aa3d1", width=290, height=400)
-        viewed_frame.grid(row=0, column=2, padx=(5, 10), pady=10, sticky="nsew")
+        
+        # Configure grid to ensure it takes the full width
+        prp.grid_columnconfigure(0, weight=1)  # Ensure the first column takes up full space
+        prp.grid_columnconfigure(1, weight=1)  # Ensure the second column takes up full space
 
-        viewed_label = Label(
-            viewed_frame,
-            text="VIEWED PROPERTIES",
-            bg="gray",
-            fg="white",
-            font=("Arial", 12, "bold"),
-            relief="ridge",
-            padx=5,
-            pady=5
-        )
-        viewed_label.pack(fill="x", pady=5)
+        # Display the list of properties
+        if properties:
+            for i, (property_name, price) in enumerate(properties):
+                # Property name
+                property_label = Label(prp, text=property_name, bg="#8aa3d1", fg="black", font=("Arial", 10), padx=10, pady=5)
+                property_label.grid(row=i + 2, column=0, sticky="w", padx=10)  # Align name to the left
 
-        divider_line = Frame(prp, bg="black", width=2, height=400)
-        divider_line.grid(row=0, column=1, sticky="ns", padx=5)
+                # Pricegit add .
+                price_label = Label(prp, text=f"₹{price}", bg="#8aa3d1", fg="black", font=("Arial", 10), padx=10, pady=5)
+                price_label.grid(row=i + 2, column=1, sticky="w", padx=10)  # Align price to the left
 
-        prp.grid_columnconfigure(0, weight=1)
-        prp.grid_columnconfigure(2, weight=1)
-        prp.grid_rowconfigure(0, weight=1)
+        else:
+            Label(prp, text="No properties found.", bg="#8aa3d1", fg="black", font=("Arial", 10), padx=10, pady=5).grid(row=1, column=0, columnspan=2, sticky="ew", pady=5)
 
+        prp.mainloop()
     def logout():
         print("Logging out")
         root.destroy()
 
-    homescreen = Label(
-        root,
-        text="HOUSING MANAGEMENT",
-        font=('Arial Black', 30, 'bold'),
-        relief=RIDGE,
-        bg='#333333',
-        fg='#ffffff'
-    )
+    # Home page screen
+    homescreen = Label(root, text="HOUSING MANAGEMENT", font=('Arial Black', 30, 'bold'), relief=RIDGE, bg='#333333', fg='#ffffff')
     Buy = Button(root, text="View properties", bg='grey', fg='black', width=20, height=2, command=buyer_page)
     Sell = Button(root, text="Add properties", bg='grey', fg='black', width=20, height=2, command=seller_page)
 
-    Back2login = Button(
-        root,
-        text="Logout",
-        relief=RAISED,
-        bg='#969997',
-        fg='black',
-        width=10,
-        height=3,
-        command=logout
-    )
-    Savedprop = Button(
-        root,
-        text="My properties",
-        relief=RAISED,
-        bg='#969997',
-        fg='black',
-        width=10,
-        height=3,
-        command=proppage
-    )
-
-    Menu = Button(
-        root,
-        text="☰",
-        relief=RAISED,
-        bg='#969997',
-        fg='black',
-        width=10,
-        height=3,
-        command=toggle_dropdown
-    )
+    Back2login = Button(root, text="Logout", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=logout)
+    Savedprop = Button(root, text="My properties", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=proppage)
+    Menu = Button(root, text="☰", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=toggle_dropdown)
 
     homescreen.grid(row=1, column=0, columnspan=2, sticky=NS)
     Buy.grid(row=3, column=0)
