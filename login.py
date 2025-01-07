@@ -1,13 +1,13 @@
 from tkinter import *
 from tkinter import messagebox
-import mysql.connector
+import mysql.connector  # type: ignore
 from home import show_main_window
 
 window = Tk()
 window.geometry("500x500")
 window.title("Login Screen")
 window.configure(background="#333333")
-login_label = Label(window, text="User Login", font=('Arial', 24, 'bold'), relief=RAISED, bg="#333333")
+login_label = Label(window, text="User Login", font=('Arial', 34, 'bold'), relief=RAISED, bg="#FFFFFF")
 login_label.grid(row=0, column=0, columnspan=3, pady=20, sticky=NSEW)
 
 def center_window(window, width, height):
@@ -62,14 +62,13 @@ def login_user(username_entry, password_entry):
                 connection.close()
             else:
                 print("No user is currently logged in.")
-
+            window.destroy()
             show_main_window()
-            window.quit()
+            
         else:
             messagebox.showerror("Login Error", "Incorrect password!")
     else:
         messagebox.showerror("Login Error", "Username not found!")
-
 def signupwindow():
     window.withdraw()
     SUwindow = Toplevel()
@@ -121,7 +120,7 @@ def signupwindow():
 
     password_label = Label(SUwindow, text="Password:", bg='#333333', fg='#ffffff')
     password_label.pack(pady=5)
-    password_entry = Entry(SUwindow, show="*")
+    password_entry = Entry(SUwindow)
     password_entry.pack(pady=5)
 
     signup_button = Button(SUwindow, text="Create account", bg='#333333', fg='#ffffff', command=lambda: register_user(username_entry, email_entry, phone_entry, password_entry))
@@ -157,9 +156,6 @@ def start_login_page():
 
     window.mainloop()
 
-if __name__ == "__main__":
-    # Try reading the current user from the text file
+if __name__ == "__main__":    # Try reading the current user from the text file
     
     start_login_page()
-
-

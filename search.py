@@ -1,5 +1,7 @@
 import mysql.connector
+import tkinter as tk
 from pprint import pprint
+
 
 # Database connection function
 def get_connection():
@@ -11,10 +13,7 @@ def get_connection():
     )
 
 def search_properties(data):
-    # Start constructing the SQL query
     base_query = "SELECT * FROM properties WHERE 1=1"
-    
-    # Dictionary to map filters to actual column names
     filter_mappings = {
         'Amenities': 'amenities',
         'Area': 'area',
@@ -24,17 +23,15 @@ def search_properties(data):
         'Property Type': 'property_type'
     }
     
-    # Collect filter conditions
     conditions = []
     values = []
-    
+
     # Process each field in the search query
     for key, value in data.items():
         if key == 'Budget' and value > 0:
             conditions.append("price <= %s")  # assuming budget is the max price
             values.append(value)
-        elif key == 'Amenities' and value:  # If there are amenities filters
-            # Assuming amenities are stored as a comma-separated string 
+        elif key == 'Amenities' and value:
             conditions.append("FIND_IN_SET(%s, amenities) > 0")
             for amenity in value:
                 values.append(amenity)
@@ -51,7 +48,6 @@ def search_properties(data):
             conditions.append("property_type = %s")
             values.append(value)
     
-    # If we have any conditions, add them to the query
     if conditions:
         base_query += " AND " + " AND ".join(conditions)
     
@@ -59,17 +55,18 @@ def search_properties(data):
     pprint(f"SQL Query: {base_query}")
     pprint(f"Values: {values}")
     
-    # Execute the query
     try:
         connection = get_connection()
-        cursor = connection.cursor(dictionary=True)  # fetch as dictionaries
+        cursor = connection.cursor(dictionary=True)
         cursor.execute(base_query, tuple(values))
         results = cursor.fetchall()
         pprint(results)  # Show results
     except mysql.connector.Error as err:
         pprint(f"Error: {err}")
+        return []  # Return an empty list in case of an error
     finally:
         if connection.is_connected():
             cursor.close()
             connection.close()
-
+    
+    return results  # Return the results

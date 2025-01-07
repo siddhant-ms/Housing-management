@@ -1,9 +1,9 @@
 import tkinter as tk
-
 from search import search_properties
 from pprint import pprint
 
-def buyer_page():
+def buyer_page(proot):
+    proot.destroy()
     ## updates the slider label
     def update_budget_label(value):
         value = int(value)
@@ -221,36 +221,38 @@ def buyer_page():
 
     def data_dict():
         data = {}
-        data['Location']=location_var.get()
-        data['Area']=secondary_dropdown_var.get()
-        data['Property Type']=property_type_var.get()
-        data['Looking to']=looking_var.get()
-        if looking_var.get()=='Buy':
-            data['Budget']=budget_range.get()
+        data['Location'] = location_var.get()
+        data['Area'] = secondary_dropdown_var.get()
+        data['Property Type'] = property_type_var.get()
+        data['Looking to'] = looking_var.get()
+        
+        if looking_var.get() == 'Buy':
+            data['Budget'] = budget_range.get()
         else:
-            data['Budget']=rent_range.get()
-        amenities=[]
-        if amenity_var1.get()==1:
+            data['Budget'] = rent_range.get()
+        
+        amenities = []
+        if amenity_var1.get() == 1:
             amenities.append("Lift")
-        if amenity_var2.get()==1:
+        if amenity_var2.get() == 1:
             amenities.append("Public Transport")
-        if amenity_var3.get()==1:
+        if amenity_var3.get() == 1:
             amenities.append("Hospital")
-        if amenity_var4.get()==1:
+        if amenity_var4.get() == 1:
             amenities.append("Furnished")
-        if amenity_var5.get()==1:
+        if amenity_var5.get() == 1:
             amenities.append("Gym")
-        if amenity_var6.get()==1:
+        if amenity_var6.get() == 1:
             amenities.append("Parking")
-        data['Amenities']=amenities
-
+        data['Amenities'] = amenities
 
         pprint(data)
 
-        search_properties(data)
+       
 
 
-    search_button = tk.Button(root, text="Search", bg="#ffffff",command=data_dict)
+
+    search_button = tk.Button(root, text="Search", bg="#ffffff", command=data_dict)
     search_button.grid(row=16, column=0, columnspan=2, pady=20)
 
     # Start the main loop

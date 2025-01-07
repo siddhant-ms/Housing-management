@@ -89,8 +89,8 @@ def show_main_window():
 
     # Home page screen
     homescreen = Label(root, text="HOUSING MANAGEMENT", font=('Arial Black', 30, 'bold'), relief=RIDGE, bg='#333333', fg='#ffffff')
-    Buy = Button(root, text="View properties", bg='grey', fg='black', width=20, height=2, command=buyer_page)
-    Sell = Button(root, text="Add properties", bg='grey', fg='black', width=20, height=2, command=seller_page)
+    Buy = Button(root, text="View properties", bg='grey', fg='black', width=20, height=2, command=lambda:buyer_page(root))
+    Sell = Button(root, text="Add properties", bg='grey', fg='black', width=20, height=2, command=lambda: seller_page(root))
 
     Back2login = Button(root, text="Logout", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=logout)
     Savedprop = Button(root, text="My properties", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=proppage)

@@ -1,3 +1,4 @@
+from logging import root
 import tkinter as tk
 from functions import get_locations_from_db, execute_query, retrieve_current_user
 
@@ -35,7 +36,7 @@ def insert_property_data(form_data, username):
 def update_price_slider(selected_option, price_slider, price_slider_label, price_value_label):
     if selected_option == "Sell":
         price_slider_label.config(text="SELL PRICE")
-        price_slider.config(troughcolor="#8aa3d1", from_=1000000, to=500000000, resolution=1000000, command=lambda value: update_price_label(value, price_value_label))
+        price_slider.config(troughcolor="#8aa3d1", from_=0, to=50000000, resolution=1000000, command=lambda value: update_price_label(value, price_value_label))
         update_price_label(price_slider.get(), price_value_label)
     elif selected_option == "Rent":
         price_slider_label.config(text="RENT PRICE")
@@ -76,6 +77,7 @@ def retrieve_form_data(name_entry, property_type_var, location_var, secondary_va
     # Retrieving the data from each widget
     name = name_entry.get()  # Name field
     property_type = property_type_var.get()  #  (Independent, Apartment, Commercial)
+    print(property_type)
     location = location_var.get()  #  (City)
     area = secondary_var.get()  # Area (City-specific)
     property_name = property_name_entry.get()  
@@ -133,7 +135,8 @@ def retrieve_form_data(name_entry, property_type_var, location_var, secondary_va
         insert_property_data(form_data, current_user)
 
 # Function to set up the seller page UI and its interactions
-def seller_page():
+def seller_page(proot):
+    proot.destroy()
     # Retrieve city and areas data from DB
     global city_areas
     city_areas = get_locations_from_db()
@@ -249,8 +252,9 @@ def seller_page():
     submit_button = tk.Button(main_frame, text="Submit", width=6, font=("bold", 15), bg=background_color, command=lambda: retrieve_form_data(name_entry, property_type_var, location_var, secondary_var, property_name_entry, looking_to_var, price_slider, bhk_var, sq_ft_entry, var_lift, var_parking, var_gym, var_furnished, var_public_transport, var_hospital, about_text))
     submit_button.grid(row=1, column=0, padx=10, pady=10, sticky="s")
 
+
+
     # Start the Tkinter event loop
     root.mainloop()
-
 if __name__ == "__main__":
-    seller_page()
+    seller_page()  # Pass proot as an argument when calling seller_page()
