@@ -1,6 +1,9 @@
+from logging import root
+from logging import*
 import tkinter as tk
-from search import search_properties
-from pprint import pprint
+from functions import retrieve_current_user,execute_query
+from search import search_win
+import homepage
 
 def buyer_page(proot):
     proot.destroy()
@@ -104,7 +107,7 @@ def buyer_page(proot):
     root = tk.Tk()
     root.title("Property Buying Page")
     root.geometry("")  
-    background_color = "#8aa3d1"
+    background_color = ("#8aa3d1")
     root.configure(bg=background_color)
 
     # Location dropdown (first dropdown)
@@ -117,9 +120,8 @@ def buyer_page(proot):
     location_dropdown.config(bg=background_color)
 
     # Adjust grid weight to allow stretching
-    root.grid_columnconfigure(0, weight=0)  
+    root.grid_columnconfigure(0, weight=1)  
     root.grid_columnconfigure(1, weight=1)  
-    root.grid_rowconfigure(1, weight=1)
     root.grid_columnconfigure(2, weight=1)  
 
     # Bind selection event to show_secondary_dropdown function
@@ -185,6 +187,13 @@ def buyer_page(proot):
     rent_min_label.grid_remove()
     rent_max_label.grid_remove()
 
+    
+    
+
+    # Create left_frame here
+    left_frame = tk.Frame(root, bg=background_color)  
+    left_frame.grid(row=0, column=0, padx=20, pady=20) 
+
     # Always visible amenities section with checkboxes
     amenities_label = tk.Label(root, text="Property and locality Amenities:", bg=background_color)
     amenities_label.grid(row=14, column=0, padx=10, pady=5, sticky="w")
@@ -219,18 +228,21 @@ def buyer_page(proot):
     parking_checkbox = tk.Checkbutton(amenities_frame, text="Parking", variable=amenity_var6, bg=background_color)
     parking_checkbox.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
-    def data_dict():
+    def insert_filter():
+        # Collect filter data from the form
         data = {}
-        data['Location'] = location_var.get()
-        data['Area'] = secondary_dropdown_var.get()
-        data['Property Type'] = property_type_var.get()
-        data['Looking to'] = looking_var.get()
-        
+        data['Location'] = location_var.get()  # Get value for Location
+        data['Area'] = secondary_dropdown_var.get()  # Get value for Area
+        data['Property Type'] = property_type_var.get()  # Get value for Property Type
+        data['Looking to'] = looking_var.get()  # Get value for Looking to (Buy/Rent)
+
+        # Set budget based on 'Looking to' field
         if looking_var.get() == 'Buy':
-            data['Budget'] = budget_range.get()
+            data['Budget'] = budget_range.get()  # Get budget for buying
         else:
-            data['Budget'] = rent_range.get()
-        
+            data['Budget'] = rent_range.get()  # Get budget for renting
+
+        # Collect selected amenities
         amenities = []
         if amenity_var1.get() == 1:
             amenities.append("Lift")
@@ -244,20 +256,75 @@ def buyer_page(proot):
             amenities.append("Gym")
         if amenity_var6.get() == 1:
             amenities.append("Parking")
+
+        # Ensure 'Amenities' is always a list, even if it's empty
         data['Amenities'] = amenities
 
-        pprint(data)
+        # Debugging: Print data before passing to insert function
+        print(f"Data being passed to insert: {data}")
 
-       
+        # Call the function to insert data into the database
+        result = insert_filter_data(data)
+        
+        if result:
+            print("Filter data inserted successfully.")
+            search_win()
+        else:
+            print("Failed to insert filter data.")
+
+
+    def insert_filter_data(form_data):
+        # Prepare the SQL query to insert the filter data into the database
+        query = """
+        INSERT INTO filters (location, area, property_type, looking_to, budget, amenities)
+        VALUES (%s, %s, %s, %s, %s, %s)
+        """
+        
+        # Ensure that 'Amenities' is a list and join it into a string for insertion
+        if isinstance(form_data['Amenities'], list):
+            # Join the amenities list into a single string
+            amenities_str = ', '.join(form_data['Amenities'])
+        else:
+            print("Error: 'Amenities' is not a list!")
+            amenities_str = ''  # Default to empty if 'Amenities' is not a list
+
+        # Prepare the data for executing the query
+        data = (
+            form_data['Location'],
+            form_data['Area'],
+            form_data['Property Type'],
+            form_data['Looking to'],
+            form_data['Budget'],
+            amenities_str
+        )
+
+        # Call the execute_query function to run the query
+        result = execute_query(query, data)
+        return result
 
 
 
-    search_button = tk.Button(root, text="Search", bg="#ffffff", command=data_dict)
-    search_button.grid(row=16, column=0, columnspan=2, pady=20)
 
+    search_button = tk.Button(root, text="Search", bg="#6a7e98", command=insert_filter)
+    search_button.grid(row=25, column=1, columnspan=1, padx=5, pady=5,sticky="ew")
+
+	# Back button			
+
+    back_button = tk.Button(text="Back", bg="#6a7e98", command=lambda: back_to_home(root)) 
+    back_button.grid(row=25, column=0, columnspan=1, padx=3, pady=3)
+
+# Function to navigate back to home page
+def back_to_home(buyer_page):
+    buyer_page.destroy()  # Destroy the current window
+
+    # Call the function to display the home page
+    homepage.show_main_window()
+    
+    
     # Start the main loop
     root.mainloop()
 
 # If the script is run directly, open the page
 if __name__ == "__main__":
     buyer_page()
+

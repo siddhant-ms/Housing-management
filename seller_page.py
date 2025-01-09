@@ -1,20 +1,25 @@
+from logging import*
 from logging import root
 import tkinter as tk
+from tkinter import messagebox
 from functions import get_locations_from_db, execute_query, retrieve_current_user
+from tkinter import*
+import homepage
+
+
 
 # Function to insert property data into the database
-def insert_property_data(form_data, username):
+def insert_property_data(form_data):
     query = """
-    INSERT INTO properties (username, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area)
+    INSERT INTO properties (phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area)
     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
-    
-    ##converts the list of amenities to a string to be instered
+
     amenities_str = ', '.join(form_data['amenities'])
 
     # Prepare the data for the query
     data = (
-        username,
+        form_data['phone_no'],
         form_data['property_name'],
         form_data['property_type'],
         form_data['looking_to'],
@@ -23,20 +28,28 @@ def insert_property_data(form_data, username):
         form_data['sq_ft'],
         amenities_str,
         form_data['description'],
-        form_data['location'],  
-        form_data['area']       
+        form_data['location'],
+        form_data['area']
     )
 
-    if execute_query(query, data):
+    # Call execute_query and check if it returns True (success)
+    result = execute_query(query, data)
+
+    # Debugging logs to print out the result of query execution
+    if result:
         print("Property data inserted successfully.")
+        return True  # Success
     else:
         print("Failed to insert property data.")
+        return False  # Failure
+
+
 
 # Function to update the price slider and its label
 def update_price_slider(selected_option, price_slider, price_slider_label, price_value_label):
     if selected_option == "Sell":
         price_slider_label.config(text="SELL PRICE")
-        price_slider.config(troughcolor="#8aa3d1", from_=0, to=50000000, resolution=1000000, command=lambda value: update_price_label(value, price_value_label))
+        price_slider.config(troughcolor="#8aa3d1", from_=0, to=50000000, resolution=1000000, command=lambda value: update_price_label(value, price_value_label))  # Updated range to 50 crore
         update_price_label(price_slider.get(), price_value_label)
     elif selected_option == "Rent":
         price_slider_label.config(text="RENT PRICE")
@@ -73,11 +86,10 @@ def show_secondary_dropdown(*args, location_var, city_areas, secondary_label, se
         secondary_dropdown.grid_remove()
 
 # Function to retrieve form data from the UI
-def retrieve_form_data(name_entry, property_type_var, location_var, secondary_var, property_name_entry, looking_to_var, price_slider, bhk_var, sq_ft_entry, var_lift, var_parking, var_gym, var_furnished, var_public_transport, var_hospital, about_text):
+def retrieve_form_data(phone_entry, property_type_var, location_var, secondary_var, property_name_entry, looking_to_var, price_slider, bhk_var, sq_ft_entry, var_lift, var_parking, var_gym, var_furnished, var_public_transport, var_hospital, about_text):
     # Retrieving the data from each widget
-    name = name_entry.get()  # Name field
+    phone_no = phone_entry.get() 
     property_type = property_type_var.get()  #  (Independent, Apartment, Commercial)
-    print(property_type)
     location = location_var.get()  #  (City)
     area = secondary_var.get()  # Area (City-specific)
     property_name = property_name_entry.get()  
@@ -106,7 +118,7 @@ def retrieve_form_data(name_entry, property_type_var, location_var, secondary_va
 
     # Collecting all the retrieved data as a dictionary
     form_data = {
-        "name": name,
+        "phone_no": phone_no,  # Changed 'name' to 'phone_number'
         "property_type": property_type,
         "location": location,
         "area": area,
@@ -119,20 +131,21 @@ def retrieve_form_data(name_entry, property_type_var, location_var, secondary_va
         "description": description
     }
 
-    # Retrieve the current user
-    current_user = retrieve_current_user()  # Calling the function to get the current user
-
-    if current_user:
-        print(f"Retrieved data for user: {current_user}")  # Print the username from the file
-    else:
-        print("No user logged in.")  # If no user found, print a message
-    
     # Printing all the form data (this can be used for debugging or further processing)
     for key, value in form_data.items():
         print(f"{key}: {value}")
 
-    if current_user:
-        insert_property_data(form_data, current_user)
+    # Insert property data
+    success = insert_property_data(form_data)
+
+    if success:
+        # If insertion is successful, show a success message
+        messagebox.showinfo("Success", "Property data inserted successfully.")
+    else:
+        # If insertion fails, show an error message
+        messagebox.showerror("Error", "Failed to insert property data.")
+
+
 
 # Function to set up the seller page UI and its interactions
 def seller_page(proot):
@@ -161,10 +174,9 @@ def seller_page(proot):
     left_frame = tk.Frame(main_frame, bg=background_color)
     left_frame.grid(row=0, column=0, padx=20, pady=20, sticky="nsew")
 
-    # Labels and entry fields for the form
-    tk.Label(left_frame, text="NAME", bg=background_color).grid(row=0, column=0, sticky='w', padx=10, pady=5)
-    name_entry = tk.Entry(left_frame)
-    name_entry.grid(row=0, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
+    tk.Label(left_frame, text="PHONE NUMBER", bg=background_color).grid(row=0, column=0, sticky='w', padx=10, pady=5)
+    phone_entry = tk.Entry(left_frame)
+    phone_entry.grid(row=0, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
     tk.Label(left_frame, text="PROPERTY TYPE", bg=background_color).grid(row=1, column=0, sticky='w', padx=10, pady=5)
     tk.Radiobutton(left_frame, text="Independent", variable=property_type_var, value="Independent", bg=background_color).grid(row=1, column=1, sticky='w', padx=10)
@@ -238,23 +250,35 @@ def seller_page(proot):
     # Checkbuttons for amenities
     tk.Checkbutton(amenities_frame, text="Lift", variable=var_lift, bg=background_color).grid(row=0, column=0, padx=5, pady=5, sticky="w")
     tk.Checkbutton(amenities_frame, text="Parking", variable=var_parking, bg=background_color).grid(row=0, column=1, padx=5, pady=5, sticky="w")
-    tk.Checkbutton(amenities_frame, text="Gym", variable=var_gym, bg=background_color).grid(row=0, column=2, padx=5, pady=5, sticky="w")
-    tk.Checkbutton(amenities_frame, text="Furnished", variable=var_furnished, bg=background_color).grid(row=1, column=0, padx=5, pady=5, sticky="w")
-    tk.Checkbutton(amenities_frame, text="Public Transport", variable=var_public_transport, bg=background_color).grid(row=1, column=1, padx=5, pady=5, sticky="w")
-    tk.Checkbutton(amenities_frame, text="Hospital", variable=var_hospital, bg=background_color).grid(row=1, column=2, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Gym", variable=var_gym, bg=background_color).grid(row=1, column=0, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Furnished", variable=var_furnished, bg=background_color).grid(row=1, column=1, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Public Transport", variable=var_public_transport, bg=background_color).grid(row=2, column=0, padx=5, pady=5, sticky="w")
+    tk.Checkbutton(amenities_frame, text="Hospital", variable=var_hospital, bg=background_color).grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
-    # Property description text box
-    tk.Label(left_frame, text="Description of the property", bg=background_color).grid(row=12, column=0, sticky='w', padx=10, pady=5)
-    about_text = tk.Text(left_frame, height=6, wrap='word')
-    about_text.grid(row=13, column=0, columnspan=4, sticky='ew', padx=10, pady=5)
+    
+    
+    # Property description text field
+    tk.Label(left_frame, text="About the property", bg=background_color).grid(row=12, column=0, sticky="w", padx=10, pady=5)
+    about_text = tk.Text(left_frame, height=5, wrap="word", bg=background_color)
+    about_text.grid(row=13, column=0, columnspan=4, padx=10, pady=5)
 
-    # Submit button to save the data
-    submit_button = tk.Button(main_frame, text="Submit", width=6, font=("bold", 15), bg=background_color, command=lambda: retrieve_form_data(name_entry, property_type_var, location_var, secondary_var, property_name_entry, looking_to_var, price_slider, bhk_var, sq_ft_entry, var_lift, var_parking, var_gym, var_furnished, var_public_transport, var_hospital, about_text))
-    submit_button.grid(row=1, column=0, padx=10, pady=10, sticky="s")
+    # Submit button
+    submit_button = tk.Button(left_frame, text="Submit", bg="#6a7e98", command=lambda: retrieve_form_data(phone_entry, property_type_var, location_var, secondary_var, property_name_entry, looking_to_var, price_slider, bhk_var, sq_ft_entry, var_lift, var_parking, var_gym, var_furnished, var_public_transport, var_hospital, about_text))
+    submit_button.grid(row=14, column=1, columnspan=1, padx=20, pady=20, sticky="e")
 
+	# Back button			
+    back_button = tk.Button(left_frame, text="Back", bg="#6a7e98", command=lambda: back_to_home(root))
+    back_button.grid(row=14, column=0, columnspan=1, padx=20, pady=20, sticky="w")
 
-
-    # Start the Tkinter event loop
+    
+# Function to navigate back to home page
+def back_to_home(seller_page):
+    seller_page.destroy()  # Destroy the current window
+   
+    # Call the function to display the home page
+    homepage.show_main_window()
+    
     root.mainloop()
+     
 if __name__ == "__main__":
     seller_page()  # Pass proot as an argument when calling seller_page()

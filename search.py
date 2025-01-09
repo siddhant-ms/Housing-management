@@ -1,72 +1,75 @@
 import mysql.connector
-import tkinter as tk
-from pprint import pprint
+from tkinter import *
 
 
-# Database connection function
-def get_connection():
-    return mysql.connector.connect(
-        host='localhost',      
-        user='root',             
-        password='1234',       
-        database='house_management',
+def fetch_filter_and_property_data():
+    # Establish connection to the database
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='1234',
+        database='house_management'
     )
-
-def search_properties(data):
-    base_query = "SELECT * FROM properties WHERE 1=1"
-    filter_mappings = {
-        'Amenities': 'amenities',
-        'Area': 'area',
-        'Budget': 'price',
-        'Location': 'city',
-        'Looking to': 'looking_to',
-        'Property Type': 'property_type'
-    }
     
-    conditions = []
-    values = []
-
-    # Process each field in the search query
-    for key, value in data.items():
-        if key == 'Budget' and value > 0:
-            conditions.append("price <= %s")  # assuming budget is the max price
-            values.append(value)
-        elif key == 'Amenities' and value:
-            conditions.append("FIND_IN_SET(%s, amenities) > 0")
-            for amenity in value:
-                values.append(amenity)
-        elif key == 'Area' and value.strip():
-            conditions.append("area LIKE %s")
-            values.append(f"%{value}%")
-        elif key == 'Location' and value.strip():
-            conditions.append("city LIKE %s")
-            values.append(f"%{value}%")
-        elif key == 'Looking to' and value.strip():
-            conditions.append("looking_to = %s")
-            values.append(value)
-        elif key == 'Property Type' and value.strip():
-            conditions.append("property_type = %s")
-            values.append(value)
+    cursor = connection.cursor(dictionary=True)  # Use dictionary cursor to get results as a dictionary
     
-    if conditions:
-        base_query += " AND " + " AND ".join(conditions)
-    
-    # Debug: Print out the query and values for validation
-    pprint(f"SQL Query: {base_query}")
-    pprint(f"Values: {values}")
+    # Queries to fetch data from both filters and properties tables
+    filters_query = "SELECT * FROM filters"
+    properties_query = "SELECT location, area, property_type, looking_to, price AS budget, amenities FROM properties"
     
     try:
-        connection = get_connection()
-        cursor = connection.cursor(dictionary=True)
-        cursor.execute(base_query, tuple(values))
-        results = cursor.fetchall()
-        pprint(results)  # Show results
-    except mysql.connector.Error as err:
-        pprint(f"Error: {err}")
-        return []  # Return an empty list in case of an error
-    finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
+        # Execute filters query
+        cursor.execute(filters_query)
+        filters_results = cursor.fetchall()  # Fetch all rows from filters table
+        
+        # Execute properties query
+        cursor.execute(properties_query)
+        properties_results = cursor.fetchall()  # Fetch all rows from properties table
+        
+        # Convert the results into dictionaries for filters
+        filters_data = []
+        for row in filters_results:
+            filter_dict = {
+                'id': row['id'],
+                'location': row['location'],
+                'area': row['area'],
+                'property_type': row['property_type'],
+                'looking_to': row['looking_to'],
+                'budget': row['budget'],
+                'amenities': row['amenities']
+            }
+            filters_data.append(filter_dict)
+        
+        # Convert the results into dictionaries for properties
+        properties_data = []
+        for row in properties_results:
+            property_dict = {
+                'location': row['location'],
+                'area': row['area'],
+                'property_type': row['property_type'],
+                'looking_to': row['looking_to'],
+                'budget': row['budget'],
+                'amenities': row['amenities']
+            }
+            properties_data.append(property_dict)
+        
+        # Return both filters and properties data
+        return {'filters': filters_data, 'properties': properties_data}
     
-    return results  # Return the results
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+        return {'filters': [], 'properties': []}
+    
+    finally:
+        cursor.close()
+        connection.close()
+
+
+
+
+
+
+
+
+def search_win():
+    window = Tk()

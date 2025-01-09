@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 import mysql.connector  # type: ignore
-from home import show_main_window
+from homepage import show_main_window
 
 window = Tk()
 window.geometry("500x500")
@@ -39,6 +39,7 @@ def get_current_user():
             return current_user
     except FileNotFoundError:
         return None 
+
 # Function to write the current user to a file
 def login_user(username_entry, password_entry):
     username = username_entry.get()
@@ -69,6 +70,7 @@ def login_user(username_entry, password_entry):
             messagebox.showerror("Login Error", "Incorrect password!")
     else:
         messagebox.showerror("Login Error", "Username not found!")
+
 def signupwindow():
     window.withdraw()
     SUwindow = Toplevel()
@@ -88,11 +90,28 @@ def signupwindow():
             messagebox.showerror("Error", "All fields must be filled!")
             return
 
+        # Validate phone number (must be exactly 10 digits)
+        if len(phno) != 10 or not phno.isdigit():
+            
+            messagebox.showerror("Error", "Phone number must be numeric and 10 digits!")
+            return
+
+        # Validate password (must be more than 4 characters)
+        if len(pwd) <= 4:
+            messagebox.showerror("Error", "Password must be more than 4 characters!")
+            return
+
+        # Validate email (must contain '.com')
+        if ".com" not in mail:
+            messagebox.showerror("Error", "Email should be valid!")
+            return
+
         try:
+            # If all validations pass, proceed with inserting the user into the database
             query = "INSERT INTO users(name, email, phone, password) VALUES(%s, %s, %s, %s);"
             cursor.execute(query, (un, mail, phno, pwd))
             connection.commit()
-            loginpage()
+            loginpage()  # After successful registration, go back to login page
         except mysql.connector.Error as err:
             messagebox.showerror("Error", "Failed to create account")
 

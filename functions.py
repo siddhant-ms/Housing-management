@@ -28,27 +28,33 @@ def get_locations_from_db():
         return {}
     
 def execute_query(query, data):
-   
-    connection = mysql.connector.connect(
-        host='localhost',
-        user='root', 
-        password='1234',  
-        database='house_management' 
-    )
-    
-    cursor = connection.cursor()
-    
+    connection = None
+    cursor = None
+
     try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='1234',
+            database='house_management'
+        )
+        cursor = connection.cursor()
+        
         cursor.execute(query, data)
         connection.commit()  # Commit the transaction
         print("Query executed successfully")
         return True
+
     except mysql.connector.Error as err:
         print(f"Error: {err}")
+        return False
+
     finally:
-        cursor.close()
-        connection.close()
-    
+        if cursor:
+            cursor.close()  # Ensure the cursor is closed if it was created
+        if connection:
+            connection.close()  # Ensure the connection is closed if it was created
+
 def retrieve_current_user():
 # Retrieve the current user from the file
     try:
@@ -57,3 +63,7 @@ def retrieve_current_user():
             return current_user
     except FileNotFoundError:
         return None  # If the file doesn't exist it means no user is logged in, therefore error
+    
+
+
+    

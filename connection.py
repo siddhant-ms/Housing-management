@@ -1,11 +1,10 @@
 import mysql.connector
 from mysql.connector import errorcode
 
-
 city_areas = {
     "Mumbai": ["Colaba", "Bandra", "Andheri", "Dadar", "Malad", "Worli", "Thane", "Borivali", "Goregaon", "Santacruz", "Khar", "Vile Parle"],
     "Delhi": ["Connaught Place", "Hauz Khas", "Greater Kailash", "Lajpat Nagar", "Karol Bagh", "Dwarka", "Saket", "Rohini", "Shalimar Bagh", "Chandni Chowk", "Gurgaon"],
-    "Bengaluru": ["MG Road", "Marathahalli", "Indiranagar", "Koramangala", "Whitefield", "Jayanagar", "Malleshwaram", "Electronic City", "HSR Layout", "Bellandur", "Rajajinagar", "Yelahanka","Dodanakundi"],
+    "Bengaluru": ["MG Road", "Marathahalli", "Indiranagar", "Koramangala", "Whitefield", "Jayanagar", "Malleshwaram", "Electronic City", "HSR Layout", "Bellandur", "Rajajinagar", "Yelahanka", "Dodanakundi"],
     "Chennai": ["T Nagar", "Anna Nagar", "Mylapore", "Adyar", "Velachery", "Nungambakkam", "Alwarpet", "Triplicane", "Egmore", "Kotturpuram", "Thiruvanmiyur"],
     "Kolkata": ["Park Street", "Salt Lake City", "Ballygunge", "Behala", "Garia", "Esplanade", "North Kolkata", "Tollygunge", "Bhowanipore"],
     "Hyderabad": ["Banjara Hills", "Jubilee Hills", "Hitech City", "Kukatpally", "Madhapur", "Ameerpet", "Old City (Hyderabad)", "Sanath Nagar", "Shamirpet", "Begumpet"],
@@ -31,7 +30,7 @@ def check_table_exists(cursor, table_name):
 
 def initialize_database():
     try:
-        # Connect to mysql server
+        # Connect to MySQL server
         connection = mysql.connector.connect(
             host="localhost",
             user="root", 
@@ -45,7 +44,6 @@ def initialize_database():
         cursor.execute("CREATE DATABASE IF NOT EXISTS house_management")
         print("Database 'house_management' created or already exists.")
 
-      
         cursor.execute("USE house_management")
         print("Using database 'house_management'.")
 
@@ -72,7 +70,7 @@ def initialize_database():
             create_properties_table_query = """
             CREATE TABLE IF NOT EXISTS properties (
                 id INT AUTO_INCREMENT PRIMARY KEY,
-                username VARCHAR(255) NOT NULL,
+                phone_no INT NOT NULL,
                 property_name VARCHAR(255) NOT NULL,
                 property_type ENUM('Independent','Apartment','Commercial') NOT NULL,
                 looking_to ENUM('Sell','Rent') NOT NULL,
@@ -89,7 +87,7 @@ def initialize_database():
             cursor.execute(create_properties_table_query)
             print("Table 'properties' created.")
 
-       
+        # Check if the city_areas table exists, if not, create it
         if check_table_exists(cursor, 'city_areas'):
             print("Table 'city_areas' already exists.")
         else:
@@ -103,14 +101,34 @@ def initialize_database():
             cursor.execute(create_city_areas_table_query)
             print("Table 'city_areas' created.")
 
-            ##inserts data into city_areas table
+            # Insert city area data
             for city, areas in city_areas.items():
                 for area in areas:
                     insert_query = "INSERT INTO city_areas (city, area) VALUES (%s, %s)"
                     cursor.execute(insert_query, (city, area))
-            
-            connection.commit()  
+
+            connection.commit()
             print("City areas data inserted successfully.")
+
+        # Check if the filters table exists, if not, create it
+        if check_table_exists(cursor, 'filters'):
+            print("Table 'filters' already exists.")
+        else:
+            create_filters_table_query = """
+            CREATE TABLE IF NOT EXISTS filters (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                location VARCHAR(255) NOT NULL,
+                area VARCHAR(255) NOT NULL,
+                property_type VARCHAR(255) NOT NULL,
+                looking_to VARCHAR(255) NOT NULL,
+                budget DECIMAL(10,2),
+                amenities TEXT
+            )
+            """
+            cursor.execute(create_filters_table_query)
+            print("Table 'filters' created.")
+
+        connection.commit()
 
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:

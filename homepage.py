@@ -87,11 +87,17 @@ def show_main_window():
         print("Logging out")
         root.destroy()
 
+    def quit_app():
+        root.destroy
+        print("closing application")
+
+    
+
     # Home page screen
     homescreen = Label(root, text="HOUSING MANAGEMENT", font=('Arial Black', 30, 'bold'), relief=RIDGE, bg='#333333', fg='#ffffff')
     Buy = Button(root, text="View properties", bg='grey', fg='black', width=20, height=2, command=lambda:buyer_page(root))
     Sell = Button(root, text="Add properties", bg='grey', fg='black', width=20, height=2, command=lambda: seller_page(root))
-
+    exit=Button(root, text="Logout", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=quit_app)
     Back2login = Button(root, text="Logout", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=logout)
     Savedprop = Button(root, text="My properties", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=proppage)
     Menu = Button(root, text="☰", relief=RAISED, bg='#969997', fg='black', width=10, height=3, command=toggle_dropdown)
@@ -105,7 +111,9 @@ def show_main_window():
     root.grid_columnconfigure(1, weight=1)
     root.grid_rowconfigure(3, weight=1)
 
+    
     root.mainloop()
 
 if __name__ == "__main__":
     show_main_window()
+
