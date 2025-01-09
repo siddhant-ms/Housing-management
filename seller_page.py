@@ -96,18 +96,47 @@ def show_secondary_dropdown(*args, location_var, city_areas, secondary_label, se
 # Function to retrieve form data from the UI
 def retrieve_form_data(phone_entry, property_type_var, location_var, secondary_var, property_name_entry, looking_to_var, price_slider, bhk_var, sq_ft_entry, var_lift, var_parking, var_gym, var_furnished, var_public_transport, var_hospital, about_text):
     # Retrieving the data from each widget
-    phone_no = phone_entry.get() 
-    property_type = property_type_var.get()  #  (Independent, Apartment, Commercial)
-    location = location_var.get()  #  (City)
-    area = secondary_var.get()  # Area (City-specific)
-    property_name = property_name_entry.get()  
-    looking_to = looking_to_var.get()  #  (Sell/Rent)
-    price = price_slider.get()  
-    bhk = bhk_var.get()  # (1 BHK, 2 BHK, 3 BHK)
-    sq_ft = sq_ft_entry.get() 
+    phone_no = phone_entry.get()
+    property_type = property_type_var.get()
+    location = location_var.get()
+    area = secondary_var.get()
+    property_name = property_name_entry.get()
+    looking_to = looking_to_var.get()
+    price = price_slider.get()
+    bhk = bhk_var.get()
+    sq_ft = sq_ft_entry.get()
 
-    # Retrieving amenities in a list so convert into string
-    selected_amenities = []  
+    # Validating fields
+    if not phone_no.isdigit() or len(phone_no) != 10:
+        messagebox.showerror("Error", "Please enter a valid 10-digit phone number.")
+        return
+
+    if not property_name:
+        messagebox.showerror("Error", "Please enter a property name.")
+        return
+
+    if not location or not area:
+        messagebox.showerror("Error", "Please select both location and area.")
+        return
+
+    if not looking_to:
+        messagebox.showerror("Error", "Please select whether you are looking to sell or rent the property.")
+        return
+
+    if price == 0:
+        messagebox.showerror("Error", "Please set a price for the property.")
+        return
+
+    if not bhk:
+        messagebox.showerror("Error", "Please select the number of BHK.")
+        return
+
+    if not sq_ft:
+        messagebox.showerror("Error", "Please enter the square footage of the property.")
+        return
+
+    # Retrieving amenities in a list and converting it into string
+    selected_amenities = []
     if var_lift.get():
         selected_amenities.append("Lift")
     if var_parking.get():
@@ -122,11 +151,11 @@ def retrieve_form_data(phone_entry, property_type_var, location_var, secondary_v
         selected_amenities.append("Hospital")
 
     # Property description
-    description = about_text.get("1.0", "end-1c")  # Property description
+    description = about_text.get("1.0", "end-1c")
 
     # Collecting all the retrieved data as a dictionary
     form_data = {
-        "phone_no": phone_no,  # Changed 'name' to 'phone_number'
+        "phone_no": phone_no,
         "property_type": property_type,
         "location": location,
         "area": area,
@@ -138,10 +167,6 @@ def retrieve_form_data(phone_entry, property_type_var, location_var, secondary_v
         "amenities": selected_amenities,
         "description": description
     }
-
-    # Printing all the form data (this can be used for debugging or further processing)
-    for key, value in form_data.items():
-        print(f"{key}: {value}")
 
     # Insert property data
     success = insert_property_data(form_data)

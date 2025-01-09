@@ -1,5 +1,6 @@
 import mysql.connector
 from mysql.connector import errorcode
+import random
 
 city_areas = {
     "Mumbai": ["Colaba", "Bandra", "Andheri", "Dadar", "Malad", "Worli", "Thane", "Borivali", "Goregaon", "Santacruz", "Khar", "Vile Parle"],
@@ -149,60 +150,92 @@ def initialize_database():
 
 
 
-# def dummy_data():
-#     # Connect to MySQL server
-#     db_connection = mysql.connector.connect(
-#         host="localhost",
-#         user="root", 
-#         password="1234", 
-#         port=3306,
-#         database="house_management"  # Ensure the database is specified here
-#     )
-#     cursor = db_connection.cursor()
+def generate_dummy_data(city_areas, num_records=20):
+    property_types = ['Independent', 'Apartment', 'Commercial']
+    looking_to = ['Sell', 'Rent']
+    bhk_options = ['1 BHK', '2 BHK', '3 BHK']
+    amenities = ['Lift', 'Public Transport', 'Hospital', 'Furnished', 'Gym', 'Parking']
 
-#     # Dummy data to be inserted into the properties table
-#     data = [
-#         ('John Doe', '1234567890', 'Green Villa', 'Independent', 'Sell', 5000000.00, '3 BHK', 2000, 'Garden, Swimming Pool, Garage', 'A spacious independent villa with a beautiful garden and pool.', 'Bengaluru', 'Whitefield'),
-#         ('Jane Smith', '9876543210', 'City Heights', 'Apartment', 'Rent', 35000.00, '2 BHK', 1200, 'Gym, Security, Elevator', 'A well-maintained 2 BHK apartment with great amenities.', 'Mysuru', 'Jayanagar'),
-#         ('Robert Brown', '1122334455', 'Skyline Tower', 'Commercial', 'Sell', 15000000.00, 'N/A', 10000, 'Parking, Lift, 24/7 Security', 'A commercial property with ample parking and security features.', 'Hubballi-Dharwad', 'Gokul Road'),
-#         ('Emily Clark', '5566778899', 'Sunny Apartment', 'Apartment', 'Rent', 25000.00, '1 BHK', 800, 'Lift, Water Supply, Security', 'A cozy 1 BHK apartment ideal for young professionals.', 'Mangaluru', 'City Centre'),
-#         ('David Green', '9988776655', 'Hilltop Residency', 'Independent', 'Sell', 7500000.00, '4 BHK', 3500, 'Swimming Pool, Balcony, Garden', 'A luxurious 4 BHK villa with amazing views and a swimming pool.', 'Belagavi', 'Kadamba'),
-#         ('Sarah Johnson', '2233445566', 'Ocean View Towers', 'Apartment', 'Rent', 42000.00, '3 BHK', 1500, 'Pool, Gym, Security, Parking', 'Modern apartment with a beautiful ocean view and great facilities.', 'Kalaburagi', 'Sadar Bazar'),
-#         ('Michael White', '3344556677', 'Business Square', 'Commercial', 'Sell', 10000000.00, 'N/A', 8000, 'Conference Room, Parking, Internet', 'A large commercial building with ample conference facilities.', 'Davangere', 'Mahalaxmi'),
-#         ('Laura Wilson', '4455667788', 'Grand Residence', 'Independent', 'Rent', 60000.00, '5 BHK', 5000, 'Gym, Garden, Garage, Swimming Pool', 'A large independent residence suitable for a family, with a garden and pool.', 'Ballari', 'District Centre'),
-#         ('Chris Black', '6677889900', 'Tech Hub', 'Commercial', 'Rent', 80000.00, 'N/A', 12000, 'Internet, Parking, 24/7 Security', 'A modern commercial hub ideal for tech companies.', 'Shivamogga', 'Tech Park'),
-#         ('Angela Blue', '7788990011', 'Peaceful Haven', 'Independent', 'Sell', 6500000.00, '3 BHK', 2500, 'Garden, Balcony, Fireplace', 'An independent house with a peaceful environment, perfect for families.', 'Tumakuru', 'Outer Ring Road')
-#     ]
-    
-#     # Ensure that phone numbers are 10 digits long
-#     for i in range(len(data)):
-#         if len(data[i][1]) != 10:
-#             print(f"Phone number {data[i][1]} is not 10 digits. Skipping insertion for this record.")
-#             continue
+    # Generate dummy data
+    data = []
+    for _ in range(num_records):  # Generate the number of records specified by num_records
+        city = random.choice(list(city_areas.keys()))
+        area = random.choice(city_areas[city])
+        property_type = random.choice(property_types)
+        look_to = random.choice(looking_to)
+        bhk = random.choice(bhk_options)
+        sq_ft = random.randint(500, 5000)  # sq_ft should not exceed 5000
+        amenities_str = random.choice(amenities)  # Random single amenity, you can expand it to more if needed
 
-#     # SQL Insert query
-#     insert_query = """
-#     INSERT INTO properties (user, phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area)
-#     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-#     """
+        # Price depending on sell or rent
+        if look_to == 'Sell':
+            price = random.choice(range(0, 150000001, 500000))  # Sell price ranges from 0 to 150,000,000 (multiples of 500000)
+        else:
+            price = random.choice(range(0, 100001, 1000))  # Rent price ranges from 0 to 100,000 (multiples of 1000)
 
-#     # Executing the insert queries
-#     cursor.executemany(insert_query, data)
+        # Generate a 10-digit phone number
+        phone_no = ''.join([str(random.randint(0, 9)) for _ in range(10)])
 
-#     # Committing the transaction
-#     db_connection.commit()
+        # Prepare the data
+        record = (
+            f'User{random.randint(1, 100)}',  # Dummy user name
+            phone_no,
+            f'Property{random.randint(1, 100)}',  # Dummy property name
+            property_type,
+            look_to,
+            price,
+            bhk,
+            sq_ft,
+            amenities_str,
+            f'This is a description of {property_type} property located in {area}, {city}.',  # Dummy description
+            city,
+            area
+        )
 
-#     # Closing the connection
-#     cursor.close()
-#     db_connection.close()
+        data.append(record)
 
-#     print("Data inserted successfully.")
+    return data
 
-# # Calling the function to insert data
-# dummy_data()
+def dummy_data(city_areas, num_records=20):
+    # Connect to MySQL server
+    db_connection = mysql.connector.connect(
+        host="localhost",
+        user="root", 
+        password="1234", 
+        port=3306,
+        database="house_management"  # Ensure the database is specified here
+    )
+    cursor = db_connection.cursor()
 
+    # Get dummy data
+    data = generate_dummy_data(city_areas, num_records)
 
-    
+    # SQL Insert query
+    insert_query = """
+    INSERT INTO properties (user, phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+
+    # Ensure that phone numbers are 10 digits long
+    for record in data:
+        if len(record[1]) != 10:
+            print(f"Phone number {record[1]} is not 10 digits. Skipping insertion for this record.")
+            continue
+
+    # Executing the insert queries
+    cursor.executemany(insert_query, data)
+
+    # Committing the transaction
+    db_connection.commit()
+
+    # Closing the connection
+    cursor.close()
+    db_connection.close()
+
+    print(f"{num_records} records inserted successfully.")
+
+# Assuming your `city_areas` dictionary is already defined, just pass it to `dummy_data`
+dummy_data(city_areas, num_records=50)  # Specify the number of records you want to generate
 
 if __name__ == "__main__":
     initialize_database()
