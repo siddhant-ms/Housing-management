@@ -69,8 +69,9 @@ def initialize_database():
         else:
             create_properties_table_query = """
             CREATE TABLE IF NOT EXISTS properties (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                phone_no INT NOT NULL,
+              id INT AUTO_INCREMENT PRIMARY KEY,
+                user VARCHAR(255) NOT NULL,
+                phone_no BIGINT NOT NULL,  -- Use BIGINT if you want to store phone numbers as numbers
                 property_name VARCHAR(255) NOT NULL,
                 property_type ENUM('Independent','Apartment','Commercial') NOT NULL,
                 looking_to ENUM('Sell','Rent') NOT NULL,
@@ -116,13 +117,15 @@ def initialize_database():
         else:
             create_filters_table_query = """
             CREATE TABLE IF NOT EXISTS filters (
-                id INT AUTO_INCREMENT PRIMARY KEY,
+               id INT AUTO_INCREMENT PRIMARY KEY,
                 location VARCHAR(255) NOT NULL,
                 area VARCHAR(255) NOT NULL,
                 property_type VARCHAR(255) NOT NULL,
                 looking_to VARCHAR(255) NOT NULL,
                 budget DECIMAL(10,2),
-                amenities TEXT
+                amenities TEXT,
+                bhk INT,  -- For the number of BHK rooms
+                square_footage DECIMAL(10, 2)
             )
             """
             cursor.execute(create_filters_table_query)
@@ -142,6 +145,64 @@ def initialize_database():
             cursor.close()
             connection.close()
             print("MySQL connection closed.")
+
+
+
+
+# def dummy_data():
+#     # Connect to MySQL server
+#     db_connection = mysql.connector.connect(
+#         host="localhost",
+#         user="root", 
+#         password="1234", 
+#         port=3306,
+#         database="house_management"  # Ensure the database is specified here
+#     )
+#     cursor = db_connection.cursor()
+
+#     # Dummy data to be inserted into the properties table
+#     data = [
+#         ('John Doe', '1234567890', 'Green Villa', 'Independent', 'Sell', 5000000.00, '3 BHK', 2000, 'Garden, Swimming Pool, Garage', 'A spacious independent villa with a beautiful garden and pool.', 'Bengaluru', 'Whitefield'),
+#         ('Jane Smith', '9876543210', 'City Heights', 'Apartment', 'Rent', 35000.00, '2 BHK', 1200, 'Gym, Security, Elevator', 'A well-maintained 2 BHK apartment with great amenities.', 'Mysuru', 'Jayanagar'),
+#         ('Robert Brown', '1122334455', 'Skyline Tower', 'Commercial', 'Sell', 15000000.00, 'N/A', 10000, 'Parking, Lift, 24/7 Security', 'A commercial property with ample parking and security features.', 'Hubballi-Dharwad', 'Gokul Road'),
+#         ('Emily Clark', '5566778899', 'Sunny Apartment', 'Apartment', 'Rent', 25000.00, '1 BHK', 800, 'Lift, Water Supply, Security', 'A cozy 1 BHK apartment ideal for young professionals.', 'Mangaluru', 'City Centre'),
+#         ('David Green', '9988776655', 'Hilltop Residency', 'Independent', 'Sell', 7500000.00, '4 BHK', 3500, 'Swimming Pool, Balcony, Garden', 'A luxurious 4 BHK villa with amazing views and a swimming pool.', 'Belagavi', 'Kadamba'),
+#         ('Sarah Johnson', '2233445566', 'Ocean View Towers', 'Apartment', 'Rent', 42000.00, '3 BHK', 1500, 'Pool, Gym, Security, Parking', 'Modern apartment with a beautiful ocean view and great facilities.', 'Kalaburagi', 'Sadar Bazar'),
+#         ('Michael White', '3344556677', 'Business Square', 'Commercial', 'Sell', 10000000.00, 'N/A', 8000, 'Conference Room, Parking, Internet', 'A large commercial building with ample conference facilities.', 'Davangere', 'Mahalaxmi'),
+#         ('Laura Wilson', '4455667788', 'Grand Residence', 'Independent', 'Rent', 60000.00, '5 BHK', 5000, 'Gym, Garden, Garage, Swimming Pool', 'A large independent residence suitable for a family, with a garden and pool.', 'Ballari', 'District Centre'),
+#         ('Chris Black', '6677889900', 'Tech Hub', 'Commercial', 'Rent', 80000.00, 'N/A', 12000, 'Internet, Parking, 24/7 Security', 'A modern commercial hub ideal for tech companies.', 'Shivamogga', 'Tech Park'),
+#         ('Angela Blue', '7788990011', 'Peaceful Haven', 'Independent', 'Sell', 6500000.00, '3 BHK', 2500, 'Garden, Balcony, Fireplace', 'An independent house with a peaceful environment, perfect for families.', 'Tumakuru', 'Outer Ring Road')
+#     ]
+    
+#     # Ensure that phone numbers are 10 digits long
+#     for i in range(len(data)):
+#         if len(data[i][1]) != 10:
+#             print(f"Phone number {data[i][1]} is not 10 digits. Skipping insertion for this record.")
+#             continue
+
+#     # SQL Insert query
+#     insert_query = """
+#     INSERT INTO properties (user, phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area)
+#     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+#     """
+
+#     # Executing the insert queries
+#     cursor.executemany(insert_query, data)
+
+#     # Committing the transaction
+#     db_connection.commit()
+
+#     # Closing the connection
+#     cursor.close()
+#     db_connection.close()
+
+#     print("Data inserted successfully.")
+
+# # Calling the function to insert data
+# dummy_data()
+
+
+    
 
 if __name__ == "__main__":
     initialize_database()

@@ -38,9 +38,9 @@ def buyer_page(proot):
             rent_max_label.config(text="₹ 1L")
 
             rent_label.grid(row=11, column=0, padx=10, pady=5, sticky="w")
-            rent_range.grid(row=12, column=0, columnspan=2, padx=20, pady=5, sticky="we")
+            rent_range.grid(row=12, column=0, columnspan=3, padx=20, pady=5, sticky="we")
             rent_min_label.grid(row=13, column=0, padx=20, pady=5, sticky="w")
-            rent_max_label.grid(row=13, column=1, padx=20, pady=5, sticky="e")
+            rent_max_label.grid(row=13, column=2, padx=20, pady=5, sticky="e")
 
             budget_label.grid_remove()
             budget_range.grid_remove()
@@ -48,14 +48,14 @@ def buyer_page(proot):
             budget_max_label.grid_remove()
 
         elif looking_var.get() == "Buy":
-            budget_range.config(from_=0, to=150000000, resolution=1000000)
+            budget_range.config(from_=0, to=150000000, resolution=500000)
             budget_min_label.config(text="₹ 0")
             budget_max_label.config(text="₹ 15 Cr")
 
             budget_label.grid(row=11, column=0, padx=10, pady=5, sticky="w")
-            budget_range.grid(row=12, column=0, columnspan=2, padx=20, pady=5, sticky="we")
+            budget_range.grid(row=12, column=0, columnspan=3, padx=20, pady=5, sticky="we")
             budget_min_label.grid(row=13, column=0, padx=20, pady=5, sticky="w")
-            budget_max_label.grid(row=13, column=1, padx=20, pady=5, sticky="e")
+            budget_max_label.grid(row=13, column=2, padx=20, pady=5, sticky="e")
 
             rent_label.grid_remove()
             rent_range.grid_remove()
@@ -138,18 +138,19 @@ def buyer_page(proot):
 
 
     ## property type options (radio buttons)
+    # Property type options (radio buttons)
     property_label = tk.Label(root, text="Property type:", bg=background_color)
     property_label.grid(row=2, column=0, padx=10, pady=5, sticky="w")
 
     property_type_var = tk.StringVar(value="Independent")
     independent_radio = tk.Radiobutton(root, text="Independent", variable=property_type_var, value="Independent", bg=background_color)
-    independent_radio.grid(row=3, column=0, padx=20, pady=2, sticky="w")
+    independent_radio.grid(row=2, column=1, padx=20, pady=2, sticky="w")  # Adjusted the row to align with the label
 
     apartment_radio = tk.Radiobutton(root, text="Apartment", variable=property_type_var, value="Apartment", bg=background_color)
-    apartment_radio.grid(row=3, column=1, padx=20, pady=2, sticky="w")
+    apartment_radio.grid(row=2, column=2, padx=20, pady=2, sticky="w")  # Adjusted the row to align with the label
 
     commercial_radio = tk.Radiobutton(root, text="Commercial", variable=property_type_var, value="Commercial", bg=background_color)
-    commercial_radio.grid(row=3, column=2, padx=20, pady=2, sticky="w")
+    commercial_radio.grid(row=2, column=3, padx=20, pady=2, sticky="w")  # Adjusted the row to align with the label
 
     # Looking to? options (radio buttons)
     looking_label = tk.Label(root, text="Looking to?", bg=background_color)
@@ -157,15 +158,13 @@ def buyer_page(proot):
 
     looking_var = tk.StringVar(value="")
     rent_radio = tk.Radiobutton(root, text="Rent", variable=looking_var, value="Rent", command=show_slider, bg=background_color)
-    rent_radio.grid(row=7, column=0, padx=20, pady=2, sticky="w")
+    rent_radio.grid(row=6, column=1, padx=20, pady=2, sticky="w")  # Adjusted row to match label position
 
     buy_radio = tk.Radiobutton(root, text="Buy", variable=looking_var, value="Buy", command=show_slider, bg=background_color)
-    buy_radio.grid(row=7, column=1, padx=20, pady=2, sticky="w")
+    buy_radio.grid(row=6, column=2, padx=20, pady=2, sticky="w")  # Adjusted row to match label position
 
-    # Ensure equal spacing between the radio buttons
-    root.grid_columnconfigure(0, weight=1, uniform="equal")
-    root.grid_columnconfigure(1, weight=1, uniform="equal")
-    root.grid_columnconfigure(2, weight=1, uniform="equal")
+    
+
 
     # Budget slider (initially hidden)
     budget_label = tk.Label(root, text="Buying Budget:", bg=background_color)
@@ -186,6 +185,9 @@ def buyer_page(proot):
     rent_range.grid_remove()
     rent_min_label.grid_remove()
     rent_max_label.grid_remove()
+
+
+    
 
     
     
@@ -228,8 +230,32 @@ def buyer_page(proot):
     parking_checkbox = tk.Checkbutton(amenities_frame, text="Parking", variable=amenity_var6, bg=background_color)
     parking_checkbox.grid(row=2, column=1, padx=5, pady=5, sticky="w")
 
+
+    # Square Footage input
+    sqft_label = tk.Label(root, text="Square Footage:", bg=background_color)
+    sqft_label.grid(row=5, column=0, padx=10, pady=5, sticky="w")
+
+    sqft_var = tk.StringVar()  # Variable to hold the square footage value
+    sqft_entry = tk.Entry(root, textvariable=sqft_var, bg=background_color)
+    sqft_entry.grid(row=5, column=1, columnspan=2, padx=10, pady=5, sticky="ew")
+
+    bhk_label = tk.Label(root, text="BHK:", bg=background_color)
+    bhk_label.grid(row=4, column=0, padx=10, pady=5, sticky="w")
+
+    bhk_var = tk.StringVar(value="1")  # Default BHK is 1
+    bhk_1_radio = tk.Radiobutton(root, text="1 BHK", variable=bhk_var, value="1", bg=background_color)
+    bhk_1_radio.grid(row=4, column=1, padx=20, pady=2, sticky="w")  # Adjusted the row to align with the label
+
+    bhk_2_radio = tk.Radiobutton(root, text="2 BHK", variable=bhk_var, value="2", bg=background_color)
+    bhk_2_radio.grid(row=4, column=2, padx=20, pady=2, sticky="w")  # Adjusted the row to align with the label
+
+    bhk_3_radio = tk.Radiobutton(root, text="3 BHK", variable=bhk_var, value="3", bg=background_color)
+    bhk_3_radio.grid(row=4, column=3, padx=20, pady=2, sticky="w") 
+
+
+
     def insert_filter():
-        # Collect filter data from the form
+    # Collect filter data from the form
         data = {}
         data['Location'] = location_var.get()  # Get value for Location
         data['Area'] = secondary_dropdown_var.get()  # Get value for Area
@@ -260,12 +286,16 @@ def buyer_page(proot):
         # Ensure 'Amenities' is always a list, even if it's empty
         data['Amenities'] = amenities
 
+        # Collect BHK and Square Footage data
+        data['BHK'] = bhk_var.get()  # Get value for BHK
+        data['Square Footage'] = sqft_var.get()  # Get value for Square Footage
+
         # Debugging: Print data before passing to insert function
         print(f"Data being passed to insert: {data}")
 
         # Call the function to insert data into the database
         result = insert_filter_data(data)
-        
+
         if result:
             print("Filter data inserted successfully.")
             search_win()
@@ -273,11 +303,12 @@ def buyer_page(proot):
             print("Failed to insert filter data.")
 
 
+
     def insert_filter_data(form_data):
-        # Prepare the SQL query to insert the filter data into the database
+    # Prepare the SQL query to insert the filter data into the database
         query = """
-        INSERT INTO filters (location, area, property_type, looking_to, budget, amenities)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO filters (location, area, property_type, looking_to, budget, amenities, bhk, square_footage)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
         
         # Ensure that 'Amenities' is a list and join it into a string for insertion
@@ -295,12 +326,15 @@ def buyer_page(proot):
             form_data['Property Type'],
             form_data['Looking to'],
             form_data['Budget'],
-            amenities_str
+            amenities_str,
+            form_data['BHK'],  # Insert BHK value
+            form_data['Square Footage']  # Insert Square Footage value
         )
 
         # Call the execute_query function to run the query
         result = execute_query(query, data)
         return result
+
 
 
 

@@ -92,8 +92,7 @@ def signupwindow():
 
         # Validate phone number (must be exactly 10 digits)
         if len(phno) != 10 or not phno.isdigit():
-            
-            messagebox.showerror("Error", "Phone number must be numeric and 10 digits!")
+            messagebox.showerror("Error", "Phone number must be numeric and exactly 10 digits!")
             return
 
         # Validate password (must be more than 4 characters)
@@ -103,17 +102,35 @@ def signupwindow():
 
         # Validate email (must contain '.com')
         if ".com" not in mail:
-            messagebox.showerror("Error", "Email should be valid!")
+            messagebox.showerror("Error", "Email must be valid and contain '.com'!")
             return
+
+        # Fetch all usernames to check for uniqueness
+        cursor.execute("SELECT name FROM users;")
+        existing_users = cursor.fetchall()
+
+        # Check if the entered username already exists
+        for user in existing_users:
+            if user[0] == un:
+                messagebox.showerror("Error", "Username already exists! Please choose another one.")
+                return
 
         try:
             # If all validations pass, proceed with inserting the user into the database
             query = "INSERT INTO users(name, email, phone, password) VALUES(%s, %s, %s, %s);"
             cursor.execute(query, (un, mail, phno, pwd))
             connection.commit()
-            loginpage()  # After successful registration, go back to login page
+
+            # Inform the user that account creation was successful
+            messagebox.showinfo("Success", "Account created successfully!")
+
+            # After successful registration, go back to the login page
+            loginpage()  
+
         except mysql.connector.Error as err:
-            messagebox.showerror("Error", "Failed to create account")
+            # Catch database errors and show a relevant message
+            messagebox.showerror("Database Error", f"Failed to create account: {err}")
+
 
     def loginpage():
         SUwindow.destroy()

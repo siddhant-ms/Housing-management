@@ -10,9 +10,17 @@ import homepage
 
 # Function to insert property data into the database
 def insert_property_data(form_data):
+    # Retrieve the current logged-in user (session username)
+    current_user = retrieve_current_user()
+
+    if current_user is None:
+        print("No user is currently logged in.")
+        return False  # If no user is logged in, do not proceed
+
+    # Query to insert property data along with the user
     query = """
-    INSERT INTO properties (phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    INSERT INTO properties (phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area, user)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
 
     amenities_str = ', '.join(form_data['amenities'])
@@ -29,7 +37,8 @@ def insert_property_data(form_data):
         amenities_str,
         form_data['description'],
         form_data['location'],
-        form_data['area']
+        form_data['area'],
+        current_user  # Add the current logged-in user here
     )
 
     # Call execute_query and check if it returns True (success)
@@ -44,29 +53,28 @@ def insert_property_data(form_data):
         return False  # Failure
 
 
-
+# Function to update the price slider and its label
 # Function to update the price slider and its label
 def update_price_slider(selected_option, price_slider, price_slider_label, price_value_label):
     if selected_option == "Sell":
         price_slider_label.config(text="SELL PRICE")
-        price_slider.config(troughcolor="#8aa3d1", from_=0, to=50000000, resolution=1000000, command=lambda value: update_price_label(value, price_value_label))  # Updated range to 50 crore
+        # Ensure the range goes from 0 to 15 Cr and increments in a way that fits the range
+        price_slider.config(troughcolor="#8aa3d1", from_=0, to=150000000, resolution=500000, command=lambda value: update_price_label(value, price_value_label))  # 15 Cr range with no decimal
         update_price_label(price_slider.get(), price_value_label)
     elif selected_option == "Rent":
         price_slider_label.config(text="RENT PRICE")
-        price_slider.config(troughcolor="#8aa3d1", from_=5000, to=50000, resolution=500, command=lambda value: update_price_label(value, price_value_label))
+        price_slider.config(troughcolor="#8aa3d1",from_=0, to=100000, resolution=1000, command=lambda value: update_price_label(value, price_value_label))  # 1 Lakh range
         update_price_label(price_slider.get(), price_value_label)
 
 # Function to update the price label based on the slider value
 def update_price_label(value, price_value_label):
     value = int(value)
     if value >= 10000000:
-        price_value_label.config(text=f"₹ {value / 10000000} Cr")
+        price_value_label.config(text=f"₹ {value // 10000000} Cr")  # No decimal for Cr
     elif value >= 100000:
-        price_value_label.config(text=f"₹ {value / 100000} L")
-    elif value >= 1000:
-        price_value_label.config(text=f"₹ {value / 1000} k")
+        price_value_label.config(text=f"₹ {value // 100000} L")  # No decimal for Lakh
     else:
-        price_value_label.config(text=f"₹ {value}")
+        price_value_label.config(text=f"₹ {value}")  # For values less than 1 Lakh, display as is
 
 # Function to show the secondary dropdown (area dropdown) based on the location selected
 def show_secondary_dropdown(*args, location_var, city_areas, secondary_label, secondary_dropdown, secondary_var):
@@ -231,7 +239,7 @@ def seller_page(proot):
     tk.Radiobutton(left_frame, text="3 BHK", variable=bhk_var, value="3 BHK", bg=background_color).grid(row=8, column=3, sticky='w', padx=10)
 
     # Square footage entry
-    tk.Label(left_frame, text="SQ FT", bg=background_color).grid(row=9, column=0, sticky='w', padx=10, pady=5)
+    tk.Label(left_frame, text="Square Footage", bg=background_color).grid(row=9, column=0, sticky='w', padx=10, pady=5)
     sq_ft_entry = tk.Entry(left_frame)
     sq_ft_entry.grid(row=9, column=1, columnspan=3, sticky='ew', padx=10, pady=5)
 
