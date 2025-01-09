@@ -91,11 +91,11 @@ def display_matched_properties(matched_properties):
     window.configure(bg="#8aa3d1")
 
     # Create a frame to hold the text box and scrollbar
-    frame = Frame(window)
+    frame = Frame(window,bg="#8aa3d1")
     frame.pack(expand=True, fill=BOTH)
 
     # Create the text box with wrap set to WORD
-    text_box = Text(frame, wrap=WORD)
+    text_box = Text(frame, wrap=WORD,)
     text_box.pack(side=LEFT, expand=True, fill=BOTH)
 
     # Add scrollbar linked to the text box

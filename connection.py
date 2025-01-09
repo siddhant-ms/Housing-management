@@ -117,17 +117,17 @@ def initialize_database():
             print("Table 'filters' already exists.")
         else:
             create_filters_table_query = """
-            CREATE TABLE IF NOT EXISTS filters (
-               id INT AUTO_INCREMENT PRIMARY KEY,
+                CREATE TABLE IF NOT EXISTS filters (
+                id INT AUTO_INCREMENT PRIMARY KEY,
                 location VARCHAR(255) NOT NULL,
                 area VARCHAR(255) NOT NULL,
                 property_type VARCHAR(255) NOT NULL,
                 looking_to VARCHAR(255) NOT NULL,
-                budget DECIMAL(10,2),
+                budget DECIMAL(15,2),  -- Increased precision for larger budgets
                 amenities TEXT,
                 bhk INT,  -- For the number of BHK rooms
                 square_footage DECIMAL(10, 2)
-            )
+            );
             """
             cursor.execute(create_filters_table_query)
             print("Table 'filters' created.")
@@ -148,94 +148,6 @@ def initialize_database():
             print("MySQL connection closed.")
 
 
-
-
-def generate_dummy_data(city_areas, num_records=20):
-    property_types = ['Independent', 'Apartment', 'Commercial']
-    looking_to = ['Sell', 'Rent']
-    bhk_options = ['1 BHK', '2 BHK', '3 BHK']
-    amenities = ['Lift', 'Public Transport', 'Hospital', 'Furnished', 'Gym', 'Parking']
-
-    # Generate dummy data
-    data = []
-    for _ in range(num_records):  # Generate the number of records specified by num_records
-        city = random.choice(list(city_areas.keys()))
-        area = random.choice(city_areas[city])
-        property_type = random.choice(property_types)
-        look_to = random.choice(looking_to)
-        bhk = random.choice(bhk_options)
-        sq_ft = random.randint(500, 5000)  # sq_ft should not exceed 5000
-        amenities_str = random.choice(amenities)  # Random single amenity, you can expand it to more if needed
-
-        # Price depending on sell or rent
-        if look_to == 'Sell':
-            price = random.choice(range(0, 150000001, 500000))  # Sell price ranges from 0 to 150,000,000 (multiples of 500000)
-        else:
-            price = random.choice(range(0, 100001, 1000))  # Rent price ranges from 0 to 100,000 (multiples of 1000)
-
-        # Generate a 10-digit phone number
-        phone_no = ''.join([str(random.randint(0, 9)) for _ in range(10)])
-
-        # Prepare the data
-        record = (
-            f'User{random.randint(1, 100)}',  # Dummy user name
-            phone_no,
-            f'Property{random.randint(1, 100)}',  # Dummy property name
-            property_type,
-            look_to,
-            price,
-            bhk,
-            sq_ft,
-            amenities_str,
-            f'This is a description of {property_type} property located in {area}, {city}.',  # Dummy description
-            city,
-            area
-        )
-
-        data.append(record)
-
-    return data
-
-def dummy_data(city_areas, num_records=20):
-    # Connect to MySQL server
-    db_connection = mysql.connector.connect(
-        host="localhost",
-        user="root", 
-        password="1234", 
-        port=3306,
-        database="house_management"  # Ensure the database is specified here
-    )
-    cursor = db_connection.cursor()
-
-    # Get dummy data
-    data = generate_dummy_data(city_areas, num_records)
-
-    # SQL Insert query
-    insert_query = """
-    INSERT INTO properties (user, phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, description, city, area)
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-
-    # Ensure that phone numbers are 10 digits long
-    for record in data:
-        if len(record[1]) != 10:
-            print(f"Phone number {record[1]} is not 10 digits. Skipping insertion for this record.")
-            continue
-
-    # Executing the insert queries
-    cursor.executemany(insert_query, data)
-
-    # Committing the transaction
-    db_connection.commit()
-
-    # Closing the connection
-    cursor.close()
-    db_connection.close()
-
-    print(f"{num_records} records inserted successfully.")
-
-# Assuming your `city_areas` dictionary is already defined, just pass it to `dummy_data`
-dummy_data(city_areas, num_records=50)  # Specify the number of records you want to generate
 
 if __name__ == "__main__":
     initialize_database()

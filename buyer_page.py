@@ -361,4 +361,3 @@ def back_to_home(buyer_page):
 # If the script is run directly, open the page
 if __name__ == "__main__":
     buyer_page()
-
