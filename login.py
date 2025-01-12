@@ -7,7 +7,7 @@ window = Tk()
 window.geometry("500x500")
 window.title("Login Screen")
 window.configure(background="#333333")
-login_label = Label(window, text="User Login", font=('Arial', 34, 'bold'), relief=RAISED, bg="#FFFFFF")
+login_label = Label(window, text="User Login", font=('Arial', 34, 'bold'), relief=RAISED,fg="white", bg="#333333")
 login_label.grid(row=0, column=0, columnspan=3, pady=20, sticky=NSEW)
 
 def center_window(window, width, height):

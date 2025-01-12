@@ -15,7 +15,7 @@ def fetch_filter_and_property_data():
         cursor = connection.cursor(dictionary=True)
 
         # Queries to fetch data
-        filters_query = "SELECT * FROM filters"
+        filters_query = "SELECT * FROM filters ORDER BY id DESC LIMIT 1;"
         properties_query = """
         SELECT user, phone_no, property_name, property_type, looking_to, price, bhk, sq_ft, amenities, city, area 
         FROM properties
@@ -38,7 +38,7 @@ def fetch_filter_and_property_data():
             connection.close()
 
 
-def match_filters_with_properties(filters_data, properties_data):
+def match_filters_with_properties(filters_data: list , properties_data: list):
     """Match properties with filters, ensuring unique results."""
     matched_properties = []
     seen_properties = set()  # To track already-added properties by a unique identifier
@@ -48,7 +48,7 @@ def match_filters_with_properties(filters_data, properties_data):
             # Match conditions
             location_match = (
                 filter_item['location'].strip().lower() == property_item['city'].strip().lower()
-            ) or (
+            ) and (
                 filter_item['area'].strip().lower() == property_item['area'].strip().lower()
             )
             property_type_match = filter_item['property_type'].strip().lower() == property_item['property_type'].strip().lower()
@@ -65,8 +65,21 @@ def match_filters_with_properties(filters_data, properties_data):
             budget_match = property_item['price'] <= filter_item['budget']
 
             # Amenities match
-            filter_amenities = set(filter_item['amenities'].split(',')) if filter_item['amenities'] else set()
-            property_amenities = set(property_item['amenities'].split(',')) if property_item['amenities'] else set()
+            filter_amenities = (
+                set(item.strip() for item in filter_item['amenities'].split(',')) 
+                if filter_item['amenities'] 
+                else set()
+            )
+            property_amenities = (
+                set(item.strip() for item in property_item['amenities'].split(',')) 
+                if property_item['amenities'] 
+                else set()
+            )
+
+            print(filter_amenities)
+            print()
+            print(property_amenities)
+            
             amenities_match = not filter_amenities or bool(filter_amenities & property_amenities)
 
             # Unique identifier for the property (e.g., property name + location)
